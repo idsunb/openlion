@@ -1,0 +1,63 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Variables */
+  :root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+  }
+  
+  /* App */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--dark-color);
+    background-color: var(--light-color);
+  }
+  
+  .app {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden; /* 隐藏溢出的内容 */
+  }
+  
+  
+  
+  
+  
+
+  /* Footer */
+  /*
+  .footer {
+    display: flex;
+    align-items: center;
+    jutifypanel: center;
+    height: 48px;
+    background-color: var(--secondary-color);
+    color: #fff;
+  } 
+*/
+
+.statusBar {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    background-color: #eee;
+    z-index: 1;
+  }

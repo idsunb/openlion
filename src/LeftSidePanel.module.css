@@ -1,0 +1,59 @@
+
+  /* LeftSidePanel */
+  .leftsidepanel {
+    width: 300px;
+    height: 100%;
+
+    background-color: var(--light-color);
+    border-right: 1px solid var(--secondary-color);
+  }
+  
+  .leftsidepanel h2 {
+    margin: 16px;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--dark-color);
+  }
+  
+
+  .leftsidepanel a {
+    display: block;
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: var(--dark-color);
+    text-decoration: none;
+  }
+
+
+
+
+  
+  .mytabs {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .tablist {
+
+    display: flex;
+    flex-direction: column;
+    width: 50px;
+  }
+  
+  .tab {
+    list-style: none;
+    flex: 0 0 auto;
+    margin-right: 10px;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-right: none;
+    
+  }
+
+
+  .tab:hover {
+    border-color: #a97373;
+  }
+  

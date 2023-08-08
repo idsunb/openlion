@@ -1,0 +1,145 @@
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+const baseConfig = {
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    // options: {
+                    //   presets: ['@babel/preset-env', '@babel/preset-react'],
+                    // }
+                },
+
+            },
+            {
+                test: /\.node$/,
+                exclude: /node_modules/,
+                use: 'node-loader' // node-loader处理.node文件，用于处理C++模块
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader'],
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                    },
+                ],
+            },
+        ],
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+    ],
+    devServer: {
+        static: path.resolve(__dirname, 'dist'),
+        hot: true,
+        port: 8088,
+        open: true,
+    },
+};
+
+
+const mainConfig = {
+    ...baseConfig,
+    entry: './src/main.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'main.js',
+    },
+    target: 'electron-main',
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                },
+            },
+        ],
+    },
+
+};
+
+const rendererConfig = {
+    ...baseConfig,
+    entry: {
+        index: './src/index.js',
+        chat: './extensions/chatextension/index.js',
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].bundle.js',
+    },
+    target: 'electron-renderer',
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                },
+            },
+            {
+                test: /\.css$/,
+                use: ['css-loader'],
+            },
+        ],
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'My App',
+            template: 'src/index.html',
+            chunks: ['index'],
+        }),
+        new HtmlWebpackPlugin({
+            title: 'Chat Extension',
+            filename: 'chat.html',
+            template: 'extensions/chatextension/index.html',
+            chunks: ['chat'],
+        }),
+    ],
+};
+
+const preloadConfig = {
+    ...baseConfig,
+    entry: {
+        preload: './src/preload.js',
+
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+    },
+    target: 'electron-preload',
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                },
+            },
+        ],
+    },
+};
+
+module.exports = (env, argv) => {
+    console.log('env', env.NODE_ENV);
+    const isRenderer = env.NODE_ENV === 'renderer';
+    const isPreload = env.NODE_ENV === 'preload';
+    const isMain = env.NODE_ENV === 'main';
+
+    return isRenderer ? rendererConfig : isPreload ? preloadConfig : mainConfig;
+
+}

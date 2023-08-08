@@ -1,0 +1,53 @@
+.mytabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .tablist {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .tab {
+    list-style: none;
+    flex: 0 0 auto;
+    margin-right: 10px;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-bottom: none;
+    
+  }
+  
+  .active {
+    border-color: #ccc !important;
+  }
+  
+
+  
+  .tabpanel {
+    flex: 1 1 auto;
+    display: none;
+    padding: 10px;
+    border: 1px solid #ccc;
+    
+  }
+
+  .tabpanelactive {
+    display: block;
+    border: #a97373;
+  }
+  
+  .tab:hover {
+    border-color: #a97373;
+  }
+  
+  

@@ -1,0 +1,14 @@
+{
+    "pluginName": "第二个插件",
+    "description": "我的第二个 lion 插件",
+    "main": "index.html",
+    "version": "0.0.1",
+    "logo": "logo.png",
+    "features": [
+        {
+          "code": "hello",
+          "explain": "hello world",
+          "cmds":["hello2", "第二个"]
+        }
+    ]
+}

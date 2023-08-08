@@ -1,0 +1,25 @@
+.navbar {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 20px;
+  }
+  .nav-link.active {
+    background-color: #622543;
+  }
+
+  .nav-link:hover {
+    color: #007bff;
+  }
+  
+  .nav-link svg {
+    margin-right: 5px;
+    font-size: 18px;
+  }
