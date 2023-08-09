@@ -2,44 +2,22 @@
   "name": "openlion",
   "version": "1.0.0",
   "description": "",
-<<<<<<< HEAD
-  "main": "index.js",
-=======
   "main": ".webpack/main",
->>>>>>> c2b5c09 (0.1.8.9.1)
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --watch --config webpack.config.js --mode development",
     "dev": "webpack serve --config webpack.config.js --mode development",
-<<<<<<< HEAD
-    "start": "electron ."
-=======
+
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "extensions": "webpack --watch --config webpackextensions.config.js --mode development"
->>>>>>> c2b5c09 (0.1.8.9.1)
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-<<<<<<< HEAD
-    "@babel/core": "^7.22.9",
-    "@babel/preset-env": "^7.22.9",
-    "@babel/preset-react": "^7.22.5",
-    "babel-loader": "^9.1.3",
-    "electron": "^25.3.0",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.3",
-    "webpack": "^5.88.1",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-=======
+
     "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.9",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
@@ -83,6 +61,5 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
     "zustand": "^4.4.1"
->>>>>>> c2b5c09 (0.1.8.9.1)
   }
 }
