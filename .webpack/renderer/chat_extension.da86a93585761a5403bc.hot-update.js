@@ -1,3 +1,4 @@
+"use strict";
 /*
  * ATTENTION: An "eval-source-map" devtool has been used.
  * This devtool is neither made for production nor for readable output files.
@@ -6,9 +7,12 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	
-/******/ 	
-/******/ })()
-;
+self["webpackHotUpdateopenlion"]("chat_extension",{},
+/******/ function(__webpack_require__) { // webpackRuntimeModules
+/******/ /* webpack/runtime/getFullHash */
+/******/ (() => {
+/******/ 	__webpack_require__.h = () => ("a60db8dfe7ebc284fe28")
+/******/ })();
+/******/ 
+/******/ }
+);
