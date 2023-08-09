@@ -16,7 +16,7 @@ gulp.task('hello', function(cb) {
 gulp.task('webpackchat1', function () {
     return gulp.src('extensions/chatextension/index.js') // 输入文件路径
       .pipe(webpack({
-        // mode: 'production',
+        mode: 'production',
         entry: {
             chat: './extensions/chatextension/index.js',
         },
@@ -57,11 +57,20 @@ gulp.task('webpackchat1', function () {
   gulp.task('webpackchat2', function () {
     return gulp.src('extensions/chatextension2/index.js') // 输入文件路径
       .pipe(webpack({
-        // mode: 'production',
+        mode: 'production',
+        entry: {
+          chat: './extensions/chatextension2/index.js',
+      },
         output: {
           filename: 'bundle.js'
         },
         plugins: [
+          new HtmlWebpackPlugin({
+            title: 'Chat1 Extension',
+            filename: 'index.html',
+            template: './extensions/chatextension2/index.html',
+            chunks: ['chat'],
+          }),
           new CopyWebpackPlugin({
             patterns: [
               { from: 'extensions/chatextension2/extension.json', to: 'extension.json' },
