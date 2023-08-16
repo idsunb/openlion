@@ -5,9 +5,12 @@ import React, { useContext } from 'react';
 import styles from './LeftSidePanel.module.css';
 import { MyTabs, Tab, TabList, TabPanel } from './tabs/MyTabs';
 
-import ExtensionManagerUI from './extensionmd/ExtensionManagerUI';
+import ExtensionManager from './extensionmd/ExtensionManager';
 import SettingManagerUI from './setting/SettingManagerUI';
-const {triggerEvent} = window.lionAPI;
+import lionAPI from './workspace/lionAPI/lionAPI';
+
+
+// const {triggerEvent} = window.lionAPI;
 
 // import MyContext from './MyContext';
 // import 'react-tabs/style/react-tabs.css';
@@ -58,10 +61,42 @@ const LeftSidePanel = () => {
 
       }
       const handleClickEvent = () => {
-        triggerEvent('somethingHappened', { name: 'lion' });
+
+        lionAPI.callCommand('system.showNotification',{title:'you are a title',body:'you are a body'});
+
+        // console.log('handleClickEvent');
+        // lionAPI.lionEvent.register('lefttest1', (data) => {
+        //   console.log('system.eventtest1 result');
+        //   console.log(data);
+        // });
+        // lionAPI.lionEvent.trigger('lefttest1', { name: 'lion' });
+
+
+        // window.lionAPI.lionEvent.trigger('somethingHappened', { name: 'lion' })
+        // window.lionAPI.lionEvent.trigger('system.eventtest1', { name: 'lion' });
       }
 
+      const handleEventregister = () => {
+        console.log('handleEventregister')
+        lionAPI.lionEvent.register('system.eventtest1', (data) => {
+          console.log('system.eventtest1', data);
+        });
+      }
+      const handleEventtrigger = () => {
+        console.log('handleEventtrigger');
+        console.log('alittltetest');
+        lionAPI.lionEvent.trigger('system.eventtest1',9999);
+      }
+      const handleEventlook = () => {
+        console.log('handleEventlook');
+        console.log(lionAPI.lionEvent.getLionEvents());
+      }
 
+      const hellomain = () => {
+        console.log('hellomain');
+        console.log(lionAPI.getCommands());
+        lionAPI.callCommand('hellofrommain');
+      }
 
 
 return (
@@ -71,6 +106,7 @@ return (
         <TabList className={styles.tablist}>
         <Tab className={styles.tab}>测试工具</Tab>
         <Tab className={styles.tab}>扩展中心</Tab>
+        <Tab className={styles.tab}>快捷键管理</Tab>
         <Tab className={styles.tab}>设置</Tab>
         </TabList>
 
@@ -89,16 +125,26 @@ return (
       <button onClick={  handleclear }>Clear State</button>
       <button onClick={handlePath}>路径</button>
       <button onClick={handleTest}>测试</button>
-      <button onClick={handleClickEvent}>触发事件</button>
+      <button onClick={handleEventregister}>注册事件</button>
+      <button onClick={handleEventtrigger}>触发事件</button>
+      <button onClick={handleEventlook}>查看事件</button>
+      <button onClick={handleClickEvent}>点击事件</button>
+      <button onClick={hellomain}>测试是否获得main的command</button>
         </TabPanel>
         <TabPanel>
         <h2>扩展中心</h2>
-        <ExtensionManagerUI />
+        <ExtensionManager />
+        </TabPanel>
+        <TabPanel>
+        <h2>快捷键管理</h2>
+        <button onClick={()=>{lionAPI.callCommand('mainpanel.keybinding.panel.open')}}>打开快捷键管理</button>
         </TabPanel>
         <TabPanel>
         <h2>设置</h2>
         <SettingManagerUI />
         </TabPanel>
+
+
     </MyTabs>
     </div>
 );

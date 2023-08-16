@@ -7,8 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --watch --config webpack.config.js --mode development",
     "dev": "webpack serve --config webpack.config.js --mode development",
-
-    "start": "electron-forge start",
+    "start": "electron-forge start --inspect-electron",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "extensions": "webpack --watch --config webpackextensions.config.js --mode development"
@@ -17,7 +16,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-
     "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.9",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
@@ -37,6 +35,8 @@
     "css-loader": "^6.8.1",
     "electron": "^25.3.0",
     "electron-devtools-installer": "^3.2.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-reloader": "^1.2.3",
     "file-loader": "^6.2.0",
     "gulp": "^4.0.2",
     "gulp-webpack": "^1.5.0",

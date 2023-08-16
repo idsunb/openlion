@@ -1,7 +1,7 @@
 import React, { useState,useEffect,useReducer, useContext } from 'react';
 import styles from './command.module.css';
-import { registerCommand,callCommand,getCommands } from './commands';
-const { triggerEvent, registerEvent } = window.lionAPI;
+// const { triggerEvent, registerEvent } = window.lionAPI;
+import lionAPI from '../workspace/lionAPI/lionAPI';
 
 
 // const commandInitialState = {
@@ -38,7 +38,7 @@ const { triggerEvent, registerEvent } = window.lionAPI;
   const commandInitialState = {
     isOpen: false,
     inputValue: '',
-    commands: getCommands(),
+    commands: lionAPI.getCommands(),
     filteredCommands: [],
   };
 
@@ -68,7 +68,7 @@ function LionCommand(props) {
     //   commands: props.commands,
     // });
     // const { isOpen, inputValue, filteredCommands, commands } = state;
-    const temp = getCommands();
+    const temp = lionAPI.getCommands();
 
 
 
@@ -82,23 +82,22 @@ function LionCommand(props) {
   };
 
 
+// const handleKeyDown = (event) => {
+  //   console.log(event.key);
+  //   if (event.key === 'F1') {
+  //     //更新filteredCommands
+  //     dispatch({ type: 'SET_FILTERED_COMMANDS', payload: [...lionAPI.getCommands()] });
+  //     //打开命令行
+  //     dispatch({ type: 'SET_IS_OPEN', payload: true });
 
-  const handleKeyDown = (event) => {
-    console.log(event.key);
-    if (event.key === 'F1') {
-      //更新filteredCommands
-      dispatch({ type: 'SET_FILTERED_COMMANDS', payload: [...getCommands()] });
-      //打开命令行
-      dispatch({ type: 'SET_IS_OPEN', payload: true });
+  //   } else if (event.key === 'Escape') {
+  //     dispatch({ type: 'SET_IS_OPEN', payload: false });
+  //   } else if (event.key === 'Enter') {
+  //     // 测试用
+  //     callCommand('hello');
+  //   }
 
-    } else if (event.key === 'Escape') {
-      dispatch({ type: 'SET_IS_OPEN', payload: false });
-    } else if (event.key === 'Enter') {
-      // 测试用
-      callCommand('hello');
-    }
-
-  };
+  // };
 
 
 
@@ -107,9 +106,11 @@ function LionCommand(props) {
   };
 
 
-  const hellocommand = () => {
+  const hellocommand =  () => {
     // Do something...
-    console.log('hellocommand');
+    console.log('hellocommand.........................');
+    const result ="hellocommand result............"
+    return result;
   };
 
   const handleSomethingHappened = (data) => {
@@ -121,8 +122,11 @@ function LionCommand(props) {
     // Register commands
 
 
-    registerCommand('hello', hellocommand);
-    registerEvent('somethingHappened', handleSomethingHappened);
+    lionAPI.registerCommand({name:'LionCommand.open', action:()=>{dispatch({ type: 'SET_IS_OPEN', payload: true });}})
+    lionAPI.registerCommand({name:'LionCommand.close', action:()=>{dispatch({ type: 'SET_IS_OPEN', payload: false });}})
+    lionAPI.registerCommand({name:'LionCommand.fliterCommands.reflesh',action:()=>{ dispatch({ type: 'SET_FILTERED_COMMANDS', payload: [...lionAPI.getCommands()] });}})  
+    lionAPI.registerCommand({name:'hellofromlioncommand', action:hellocommand});
+    // registerEvent('somethingHappened', handleSomethingHappened);
 
 
 
@@ -132,20 +136,21 @@ function LionCommand(props) {
 
 
       // Register keydown event listener
-      document.addEventListener('keydown', handleKeyDown);
+      // document.addEventListener('keydown', handleKeyDown);
   
       // Unregister keydown event listener
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      // document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
 
 
 
-  const handleCommandClick = (command) => {
-    command.action();
+  const handleCommandClick = async (command) => {
+    const result = await lionAPI.callCommand(command.name)
+    console.log('click result',result);
   };
 
   return (

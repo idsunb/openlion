@@ -1,11 +1,14 @@
-import React, { memo, useState, useRef, useReducer,useEffect,useContext, useMemo } from 'react';
+import React, { memo, useState, useRef, useReducer, useEffect, useContext, useMemo } from 'react';
 import { MyTabs, Tab, TabList, TabPanel } from './tabs/MyTabs';
 import TabPanelTest1 from './TabPanelTest1';
 import TabPanelTest2 from './TabPanelTest2.js';
 import styles from './MainPanel.module.css';
 import path from 'path';
-const { registerEvent} = window.lionAPI;
-
+// const { registerEvent } = window.lionAPI;
+// const { registerCommand } = window.lionAPI;
+import lionAPI from './workspace/lionAPI/lionAPI';
+import KeybindingManager  from './KeybindingManager';
+import { ipcRenderer } from 'electron';
 
 // ipcRenderer.on('message', (event, message) => {
 //   console.log(message); // 输出：hello, world
@@ -16,8 +19,8 @@ const mainpanelInitialState = {
   devToolsOpen: false,
   inputVal: '',
   outputVal: '',
-  tabPanels: [{id: 0,type:'normaltext' ,pros:{title: 'Tab 1', content: 'This is the content of Tab 1.'}},
-  {id: 1, type: 'reactcomponent',pros: {title: "TabPanelTest2",componentname: "TabPanelTest1",},},],
+  tabPanels: [{ id: 0, type: 'normaltext', pros: { title: 'Tab 1', content: 'This is the content of Tab 1.' } },
+  { id: 1, type: 'reactcomponent', pros: { title: "TabPanelTest1", componentname: "TabPanelTest1", }, },],
 };
 
 
@@ -36,16 +39,16 @@ function mainpanelReducer(state, action) {
     case 'SET_OUTPUT_VALUE':
       return { ...state, outputVal: action.payload };
     case 'OPEN_NEW_TABPANEL':
-        const newTabPanel = {
-          id: state.tabPanels.length,
-          type: action.payload.type,
-          pros: action.payload.pros,
-        };
-        return {
-          ...state,
-          tabPanels: [...state.tabPanels, newTabPanel],
-          activeTab: newTabPanel.id,
-        };
+      const newTabPanel = {
+        id: state.tabPanels.length,
+        type: action.payload.type,
+        pros: action.payload.pros,
+      };
+      return {
+        ...state,
+        tabPanels: [...state.tabPanels, newTabPanel],
+        activeTab: newTabPanel.id,
+      };
     case 'OPEN_NEW_REACT_TABPANEL':
       const newReactTabPanel = {
         id: state.tabPanels.length,
@@ -58,7 +61,6 @@ function mainpanelReducer(state, action) {
         activeTab: newReactTabPanel.id,
       };
     case 'OPEN_NEW_WEBVIEW_TABPANEL':
-      console.log('OPEN_NEW_WEBVIEW_TABPANEL');
       const newWebviewTabPanel = {
         id: state.tabPanels.length,
         type: action.payload.type,
@@ -72,9 +74,8 @@ function mainpanelReducer(state, action) {
 
 
     case 'CLEAR_TAB_BAR_STATE':
-      console.log('clear state');
-      localStorage.removeItem('tabBarState');
-      return mainpanelInitialState; 
+
+      return mainpanelInitialState;
 
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -89,12 +90,12 @@ const MainPanel = () => {
   // const [mainpanelState, mainpanelDispatch] = useReducer(mainpanelReducer, savedState ? JSON.parse(savedState) : mainpanelInitialState);
 
   // const { mainpanelState:state, mainpanelDispatch:dispatch } = useMyContextState();
-  
+
   // const [activeTab, setActiveTab] = useState(0);
   const ChatExtensionRef = useRef(null);
   // const [input, setInput] = useState('');
   // const [output, setOutput] = useState('');
-  
+
 
 
   const handleOpenNewTabPanel = () => {
@@ -103,17 +104,17 @@ const MainPanel = () => {
       payload: {
         type: 'normaltext',
         pros: {
-        title: 'New Tab',
-        content: 'This is a new tab.',
+          title: 'New Tab',
+          content: 'This is a new tab.',
         },
       },
     });
   };
-  
 
 
 
-  const handleFormSubmit =  async (event) => {
+
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
 
     const res = await model.call(input);
@@ -121,17 +122,17 @@ const MainPanel = () => {
   };
 
   function handleOpenPluginManager() {
-      ReactDOM.render(<PluginManager />, document.getElementById('root'));
-    
+    ReactDOM.render(<PluginManager />, document.getElementById('root'));
+
   }
 
   //增加一个react组件页面
-  const handleOpenNewRactTabPanel = (pros) => () => {
+  const handleOpenNewRactTabPanel = ({ title, componentname }) => () => {
     dispatch({
       type: 'OPEN_NEW_REACT_TABPANEL',
       payload: {
         type: 'reactcomponent',
-        pros: pros,
+        pros: { title, componentname }
       },
     });
   };
@@ -139,10 +140,12 @@ const MainPanel = () => {
   //打开一个webview
   const handleOpenWebview = () => {
     console.log('handleOpenWebview');
-    const preloadpath = lionAPI.getPreloadFilePath();
-    console.log(preloadpath);
+    // const preloadpath = 'D:\\文档\\codes\\openlion\\src\\extensionpreload.js';
+    const preloadpath = 'D:\\文档\\codes\\openlion\\.webpack\\renderer\\extension\\preload.js';
+    console.log('preloadpath',preloadpath);
+    console.log('preloadpath',lionAPI.getPreloadFilePath());
 
-    const testpath = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html';
+    // const testpath = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html';
     //直接使用本地文件路径
     // const anotherpath = 'D:\\文档\\codes\\openlion\\src\\extensionpreload.js';
     // const preload = `file://${__dirname}/preload.js`;
@@ -154,11 +157,11 @@ const MainPanel = () => {
         pros: {
           title: 'Tab 2',
           id: "chatextension",
-          nodeintegration:"true",
-          
-          // src:"http://localhost:3000/chat_extension",
-          src:testpath,
-          style:{ width: '400px', height: '300px' },
+          nodeintegration: "true",
+
+          src:"http://localhost:3000/chat_extension",
+          // src: testpath,
+          style: { width: '400px', height: '300px' },
           webpreferences: {
             devTools: true,
             nodeIntegration: true,
@@ -171,9 +174,9 @@ const MainPanel = () => {
 
           },
           // preload:preloadpath,
-        preload:`file://${preloadpath}`,
-        // preload:anotherpath,
-            // preload: path.join(__dirname, 'preload.js'),
+          preload: `file://${preloadpath}`,
+          // preload:anotherpath,
+          // preload: path.join(__dirname, 'preload.js'),
 
           // preload:{'file://${__dirname}/preload.js'},
         },
@@ -182,29 +185,39 @@ const MainPanel = () => {
   };
 
   const handleclear = () => {
+    console.log('clear state');
+    localStorage.removeItem('tabBarState');
+    const webviews = document.getElementsByTagName('webview');
+    for (let i = 0; i < webviews.length; i++) {
+
+      const webid = webviews[i].getWebContentsId();
+      // webviews[i].send('beforeunload',webid);
+      webviews[i].closeDevTools();
+      webviews[i].remove();
+       // 关闭webview 
+
+
+    }
     dispatch({ type: 'CLEAR_TAB_BAR_STATE' });
   };
 
   const handleOpenNewTabPanelTest = (data) => {
     console.log('handleOpenNewTabPanelTest');
-    const {name,path:windowsPath} = data;
+    const { name, path: windowsPath } = data;
     // 将 Windows 路径转换为 Unix 路径
     const fileUrl = 'file:///' + windowsPath;
 
-const unixPath = path.join('/', windowsPath.replace(/\\/g, '/')).normalize();
-console.log('unixPath',unixPath);
-console.log('fileUrl',fileUrl);
-    console.log(data);
+    const unixPath = path.join('/', windowsPath.replace(/\\/g, '/')).normalize();
     dispatch({
       type: 'OPEN_NEW_WEBVIEW_TABPANEL',
       payload: {
         type: 'webview',
-        pros: { 
+        pros: {
           title: name,
           id: "chatextension",
-          nodeintegration:"true",
-          src:fileUrl,
-          style:{ width: '400px', height: '300px' },
+          nodeintegration: "true",
+          src: fileUrl,
+          style: { width: '400px', height: '300px' },
           webpreferences: {
             devTools: true,
             nodeIntegration: true,
@@ -249,9 +262,17 @@ console.log('fileUrl',fileUrl);
 
     });
 
-    
 
-    registerEvent('open-main-panel-tab', handleOpenNewTabPanelTest);
+
+
+
+    // registerEvent('open-main-panel-tab', handleOpenNewTabPanelTest);
+    lionAPI.lionEvent.register('open-main-panel-tab', handleOpenNewTabPanelTest);
+
+    lionAPI.lionEvent.trigger('system.eventtest1',3412);
+    lionAPI.registerCommand({name:'mainpanel.keybinding.panel.open', action:
+    () => { handleOpenNewRactTabPanel({ title: '快捷键管理', componentname: 'KeybindingManager', })()}});
+    console.log('lionAPI',lionAPI.getCommands())
 
     return () => {
       window.removeEventListener('message');
@@ -260,8 +281,18 @@ console.log('fileUrl',fileUrl);
 
 
   useEffect(() => {
+    // const webviews = document.getElementsByTagName('webview');
+    // for (let i = 0; i < webviews.length; i++) {
+    //   webviews[i].addEventListener('beforeunload', () => {
+    //     console.log('webview beforeunload1');
+    //   });
+    // }
     localStorage.setItem('tabBarState', JSON.stringify(state));
+    
   }, [state]);
+
+
+
 
   // const handleTabChange = (index) => {
   //   dispatch({ type: 'SET_ACTIVE_TAB', payload: index });
@@ -272,84 +303,59 @@ console.log('fileUrl',fileUrl);
     // dispatch({ type: 'OPEN_DEVTOOLS', ref: ChatExtensionRef.current });
   };
 
-  const tabPanellist = useMemo(() => {
-      console.log('mainPanelTabPanels');
-      return state.tabPanels.map(({ id, type, pros }) => {
-        if (type === 'normaltext') {
-          return (<TabPanel key={id} >{pros.content}</TabPanel>);
-        }
-        else if (type === 'reactcomponent') {
-          switch (pros.componentname) {
-            case 'TabPanelTest1':
-              return (<TabPanel key={id} ><TabPanelTest1 /></TabPanel>);
-            case 'TabPanelTest2':
-              return (<TabPanel key={id} ><TabPanelTest2 /></TabPanel>);
-            default:
+  const tabPanellistRender = useMemo(() => {
 
-          }
+    return state.tabPanels.map(({ id, type, pros }) => {
+      if (type === 'normaltext') {
+        return (<TabPanel key={id} >{pros.content}</TabPanel>);
+      }
+      else if (type === 'reactcomponent') {
+        switch (pros.componentname) {
+          case 'TabPanelTest1':
+            return (<TabPanel key={id} ><TabPanelTest1 /></TabPanel>);
+          case 'TabPanelTest2':
+            return (<TabPanel key={id} ><TabPanelTest2 /></TabPanel>);
+          case 'KeybindingManager':
+            return (<TabPanel key={id} ><KeybindingManager /></TabPanel>);
+          default:
+            return null;
         }
-        else if (type === 'webview') {
-          console.log('webview');
-          return (<TabPanel key={id} ><webview {...pros} ></webview></TabPanel>);
-        }
-        else {
-          return <TabPanel >wrong type</TabPanel>;
-        }
-      });
-    }, [state.tabPanels]);
+      }
+      else if (type === 'webview') {
+        return (
+          <TabPanel key={id}>
+            <webview name={`webview-${id}`} {...pros} ></webview>
+
+            <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].openDevTools(); }}>打开webview 开发者工具</button>
+            <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].closeDevTools(); }}>关闭webview 开发者工具</button>
+          </TabPanel>
+        );
+      }
+      else {
+        return <TabPanel key={id}>wrong type</TabPanel>;
+      }
+    });
+
+  }, [state.tabPanels]);
 
 
   const handleSetActiveTab = (index) => {
     dispatch({ type: 'SET_ACTIVE_TAB', payload: index });
   };
-          
+
 
 
   return (
     <div className={styles.mainpanel}>
 
-<MyTabs activeIndex={state.activeTab} onTabClick={handleSetActiveTab}>
-      <TabList >
-      {state.tabPanels.map((tabPanel) => (<Tab  key={tabPanel.id}>{tabPanel.pros.title}{console.log('我被渲染了')}</Tab>))}
-      </TabList>
+      <MyTabs activeIndex={state.activeTab} onTabClick={handleSetActiveTab}>
+        <TabList >
+          {state.tabPanels.map((tabPanel) => (<Tab key={tabPanel.id}>{tabPanel.pros.title}{console.log('我被渲染了')}</Tab>))}
+        </TabList>
+        {tabPanellistRender}
 
-      {state.tabPanels.map(({ id, type, pros }) => {
-        if (type === 'normaltext') {
-          return (<TabPanel key={id} mykey={id} >{pros.content}</TabPanel>);
-        }
-        else if (type === 'reactcomponent') {
-          switch (pros.componentname) {
-            case 'TabPanelTest1':
-              return (<TabPanel key={id} mykey={id}><TabPanelTest1 /></TabPanel>);
-            case 'TabPanelTest2':
-              return (<TabPanel key={id} mykey={id}><TabPanelTest2 /></TabPanel>);
-            default:
-
-          }
-        }
-        else if (type === 'webview') {
-          console.log('webview');
-          console.log(id);
-          return (<TabPanel key={id} mykey={id} ><webview {...pros} >
-            <button onClick={() => { document.getElementById(pros.id).openDevTools(); }}>Open DevTools</button>
-            <button onClick={() => { document.getElementById(pros.id).closeDevTools(); }}>Close DevTools</button>
-            
-            </webview></TabPanel>);
-
-
-          
-
-
-
-
-
-        }
-        else {
-          return <TabPanel >wrong type</TabPanel>;
-        }
-      })}
       </MyTabs>
-{/*       
+      {/*       
     <button onClick={handleOpenNewRactTabPanel({
             title: 'Tab 2',
             componentname: 'TabPanelTest1',
@@ -361,8 +367,8 @@ console.log('fileUrl',fileUrl);
       {/* <button onClick={handleAddTab}>Add Tab</button> */}
       {/* <button onClick={handleAddTab1}>Add Tab</button> */}
       {/* <button onClick={handleOpenDevTools}>Open DevTools</button> */}
-      
-</div>
+
+    </div>
   );
 
 

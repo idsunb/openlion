@@ -6,10 +6,6 @@ function MyTabs({ children, activeIndex = 0, onTabClick, onTabMove, className, .
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [activeIndexState, setActiveIndexState] = useState(activeIndex);
 
-  console.log('activeIndexState');
-  console.log(activeIndexState);
-  console.log('activeIndex');
-  console.log(activeIndex);
 
 
 
@@ -51,7 +47,6 @@ function MyTabs({ children, activeIndex = 0, onTabClick, onTabMove, className, .
       if (child.type === TabList) {
         return React.cloneElement(child, {
           children: React.Children.map(child.props.children, (tab, tabIndex) => {
-            console.log('tabIndex', tabIndex);
             return React.cloneElement(tab, {
               key: tabIndex,
               className: `${tab.props.className || styles.tab || ''} ${tabIndex === activeIndexState ? styles.active : ''}`,
@@ -85,28 +80,20 @@ function MyTabs({ children, activeIndex = 0, onTabClick, onTabMove, className, .
 }
 
 function MyTabsContainer({className,...props}) {
-  console.log('mytabscontainer');
-  console.log(className);
   return <div className={className || styles.mytabs } {...props} />;
 }
 
 function TabList({className,...props}) {
-  console.log('tablist');
-  console.log(className);
 
   return <ul className={className||styles.tablist} {...props} />;
 }
 
 function Tab({className,...props}) {
-  console.log('tab');
-  console.log(className);
 
   return <li className={className||styles.tab} {...props} />;
 }
 
 function TabPanel({className,...props}) {
-  console.log('tabpanel');
-  console.log(className);
   return <div className={className||styles.tabpanel} {...props} />;
 }
 
