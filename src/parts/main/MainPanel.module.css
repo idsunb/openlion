@@ -1,0 +1,67 @@
+
+  /* MainPanel */
+  .mainpanel {
+    flex: 1;
+    padding: 8px;
+
+    
+  }
+  
+  .mainpanel h1 {
+    margin-bottom: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--dark-color);
+  }
+  
+  .mainpanel p {
+    margin-bottom: 16px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--dark-color);
+  }
+  
+  .mainpanel a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .mainpanel a:hover {
+    text-decoration: underline;
+  }
+  .mainpanel ul {
+    list-style: none;
+
+  }
+  
+  .mainpanel li {
+    list-style: none;
+  }
+  
+  .tabs {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tablist {
+    display: flex;
+    flex-direction: row;
+  } 
+  
+  .tab {
+    padding: 3px;
+    margin: 6px;
+    background-color: #eee;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .defaulttabpanel
+  {
+    display: none;
+  }
+
+  .selectedTabPanel
+  {
+    display: block;
+  }

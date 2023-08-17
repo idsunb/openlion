@@ -7,13 +7,13 @@ import ReactDOM from 'react-dom';
 // import NavBar from './NavBar';
 // import SideBar from './SideBar';
 
-import LeftSidePanel from './LeftSidePanel';
-import MainPanel from './MainPanel';
-import RightSidePanel from './RightSidePanel';
+import LeftSidePanel from './parts/leftpanel/LeftSidePanel';
+import MainPanel from './parts/main/MainPanel';
+import RightSidePanel from './parts/rightpanel/RightSidePanel';
 // import './App.css';
 import styles from './App.module.css';
 import {MyContextProvider} from './MyContext';
-import LionCommand from './lioncommand/LionCommand';
+import LionCommand from './parts/lioncommand/LionCommand';
 
 
 

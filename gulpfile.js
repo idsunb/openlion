@@ -95,10 +95,46 @@ gulp.task('webpackchat1', function () {
       .pipe(gulp.dest(path.resolve('C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions','chat2'))); // 输出文件路径
   });
 
+  //暂时为2
+  gulp.task('webpackchat3', function () {
+    return gulp.src('extensions/chatextension3/App.js') // 输入文件路径
+      .pipe(webpack({
+        mode: 'production',
+        entry: {
+          chat: './extensions/chatextension3/App.js',
+      },
+        output: {
+          filename: 'App.js'
+        },
+        plugins: [
+          new CopyWebpackPlugin({
+            patterns: [
+              { from: 'extensions/chatextension3/extension.json', to: 'extension.json' },
+            ],
+          }),
+        ],
+        module: {
+          rules: [
+            {
+              test: /\.js$/,
+              exclude: /node_modules/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env', '@babel/preset-react']
+                }
+              }
+            }
+          ]
+        }
+      })) // 使用 webpack-stream 插件，传递 webpack 配置
+      .pipe(gulp.dest(path.resolve('C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions','chat3'))); // 输出文件路径
+  });
+
 
 
   
-  exports.default = gulp.series('hello','webpackchat1','webpackchat2'); // 定义默认任务
+  exports.default = gulp.series('hello','webpackchat1','webpackchat2','webpackchat3'); // 定义默认任务
 
 
 //   function defaultTask(cb) {

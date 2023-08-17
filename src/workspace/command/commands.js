@@ -14,8 +14,7 @@ commands.push(...initialCommands);
 
 
 export const registerCommand = ({name,action,type='renderer',source='renderer'}) => {
-  console.log('registerCommand');
-  console.log('commandname',name );
+
   //如果在本地上下文文件中已经存在该命令，则不再注册
   const existingCommand = commands.find(c => c.name === name);
   if (existingCommand) {
@@ -27,7 +26,7 @@ export const registerCommand = ({name,action,type='renderer',source='renderer'})
     ipcRenderer.send('registerCommand', { name:name, action:'', type:'renderer',source:source });
     commands.push({name:name, action:action, type:type,source:source });
   } 
-  console.log('command', commands);
+  console.log(`register command:${name}, commands:`,commands);
 
 }
 
@@ -62,7 +61,7 @@ const callCommandLocal = async (name, args) => {
     //如果存在于本地，则直接调用本地的action
     console.warn('exist command,call from local');
     const result =   await command.action(args);
-    console.log('command name', name);
+    console.log(`call local command name:${name}`);
     return result;
   } else {
     console.warn('not exist local command');
@@ -74,7 +73,7 @@ const callCommandLocal = async (name, args) => {
 
 
 export const getCommands = () => {
-  console.log('getcommands', commands);
+  console.log('getcommands:', commands);
   return commands;
 }
 

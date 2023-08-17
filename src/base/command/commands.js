@@ -36,7 +36,6 @@ commands.push(...initialCommands);
 // }
 
 export const registerCommand = ({ name, action, type , source = 'renderer' }) => {
-  console.log('registerCommand');
   const existingCommand = commands.find((c) => c.name === name);
   if (existingCommand) {
     console.warn(`Command "${name}" already exists. Skipping...`);
@@ -54,13 +53,12 @@ export const registerCommand = ({ name, action, type , source = 'renderer' }) =>
     });
   }
   commands.push({ name, type, action, source });
-  console.log('command', commands);
+  console.log(`registetr command commands:${commands}`);
 };
 
 
 export const callCommand = async (name, args = []) => {
-  console.log('command name', name);
-  console.log('all commands', commands)
+  console.log(`command name:${name} all commands:`, commands);
   const command = commands.find((c) => c.name === name);
 
   if (command) {
@@ -93,7 +91,7 @@ export const callCommand = async (name, args = []) => {
 
 
 export const getCommands = () => {
-  console.log('getcommands', commands);
+  console.log(`getcommands:${commands}`);
   return commands;
 }
 
@@ -102,7 +100,7 @@ ipcMain.on('registerCommand', (event, command) => {
   const webcontent = event.sender;
 
 
-  console.log('registercommand', command);
+  console.log('system registercommand', command);
   if (command.type === 'renderer') {
 
     webcontent.on('destroyed', () => {
@@ -118,7 +116,7 @@ ipcMain.on('registerCommand', (event, command) => {
 //处理远端callCommand
 ipcMain.handle('callCommand', async (event, { name, args }) => {
 
-  console.log('callCommand', name, args);
+  console.log('system callCommand', name, args);
   const result = await callCommand(name, args);
   return result;
   // callCommand(command.name, command.args);

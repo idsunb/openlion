@@ -1,14 +1,31 @@
 {
-    "pluginName": "第二个插件",
-    "description": "我的第二个 lion 插件",
-    "main": "index.html",
-    "version": "0.0.1",
-    "logo": "logo.png",
-    "features": [
-        {
-          "code": "hello",
-          "explain": "hello world",
-          "cmds":["hello2", "第二个"]
-        }
-    ]
+  "activate": "",
+  "deactivate": "",
+  "main": "./extension.js",
+  "title": "My Extension 2",
+  "version": "1.0.0",
+  "publisher": "My Publisher",
+  "name": "my-extension-test2",
+  "mode": "webview",
+  "preload":"",
+  "args": {
+      "activeEvents": [
+          {
+              "onCommand": "myExtension.myCommand",
+              "onFile": "myExtension.myopenfile"
+          }
+      ],
+      "keybindings": [
+          {
+              "command": "myExtension.myCommand",
+              "key": "Ctrl+Shift+m"
+          }
+      ],
+      "commands": [
+          {
+              "command": "myExtension.myCommand",
+              "title": "My Command"
+          }
+      ]
+  }
 }
