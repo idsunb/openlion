@@ -2,13 +2,13 @@
 import lionEvent from '../event/lionEvent';
 
 import { ipcRenderer } from 'electron';
-import path from 'path';
 
 import { registerCommand, getCommands, callCommand } from '../command/commands';
 
+import { lionContext } from '../context/lionContext';
+
+
 // console.log(registerCommand, getCommands, callCommand);
-
-
 
 
 // console.log(lionEvent.getLionEvents());
@@ -19,12 +19,22 @@ import { registerCommand, getCommands, callCommand } from '../command/commands';
 // lionEvent.trigger('system.eventtest1', 1234);
 
 
+
 const lionAPI = {
     // triggerEvent: triggerEvent,
     // registerEvent: registerEvent,
-    registerCommand: registerCommand,
+    lionCommand: {
+    register: registerCommand,
     getCommands: getCommands,
-    callCommand: callCommand,
+    call: callCommand,
+    },
+
+    lionContext:{
+        setState:lionContext.setState,
+        mergeState:lionContext.mergeState,
+        getState:lionContext.getState,
+
+    },
 
 
     // lionEvent:lionEvent,
@@ -34,7 +44,11 @@ const lionAPI = {
         remove: lionEvent.remove.bind(lionEvent),
         getLionEvents: lionEvent.getLionEvents.bind(lionEvent),
     },
+    getWebcontentsID: () => {
+        return webContentsID;
 
+        // return ipcRenderer.id;
+    },
 
     setTitle: (title) => {
         ipcRenderer.send('set-title', title);
@@ -56,12 +70,12 @@ const lionAPI = {
         console.log('useContexttest1');
         window.postMessage({ type: 'add-tab-panel' }, '*');
     },
-    getPreloadFilePath: () => {
-        console.log('getfilepath');
-        const myfilepath = path.join(__dirname, '..', 'extension', 'preload.js');
-        return myfilepath;
-        console.log(myfilepath);
-    },
+    // getPreloadFilePath: () => {
+    //     console.log('getfilepath');
+    //     const myfilepath = path.join(__dirname, '..', 'extension', 'preload.js');
+    //     return myfilepath;
+    //     console.log(myfilepath);
+    // },
     // node: () => process.versions.node,
     // chrome: () => process.versions.chrome,
     // electron: () => process.versions.electron,
@@ -72,8 +86,9 @@ const lionAPI = {
         return response;
     },
     getExtensionPath: async () => {
-        const response = await ipcRenderer.invoke('system:getUserDataPath');
-        return path.join(response, 'extensions');
+        const response = 'c:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\'
+        // const response = await ipcRenderer.invoke('system:getUserDataPath');
+        // return path.join(response, 'extensions');
     },
     openMainPanelTab: ({ name, path }) => {
         // triggerEvent('open-main-panel-tab', { name, path });
@@ -85,5 +100,7 @@ const lionAPI = {
 export default lionAPI;
 
 
+module.exports = lionAPI;
 
 
+console.log('lionAPI context',lionContext.getState() );

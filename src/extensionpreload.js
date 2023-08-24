@@ -1,20 +1,13 @@
 
 const { contextBridge,ipcRenderer,app  } = require('electron');
-const path = require('path');
-import {  registerCommand, getCommands, callCommand } from './workspace/command/commands';
 // import lionEvent from './workspace/event/lionevent';
 import lionAPI from './workspace/lionAPI/lionAPI';
 
 
-window.addEventListener('load', (event) => {
-  ipcRenderer.send('finishload', 'finishload111111');
-  console.log('load');
-});
 
-ipcRenderer.on('beforeunload', (event, data) => {
-  ipcRenderer.send('finishunload', data);
-  console.log('beforeunload');
-});
+ipcRenderer.send('sendID','no')
+
+
 
 
 // const lionAPI = {

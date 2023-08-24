@@ -1,11 +1,12 @@
 const keybinds = {};
 // const lionAPI = window.lionAPI;
+import lionAPI from "../lionAPI/lionAPI";
 
 const keybindInitialMap = {
   'Ctrl+S': {commandName:'save',when:'editorTextFocus',source:'myExtension'},
   'Ctrl+Shift+S': {commandName:'saveAs',when:'editorTextFocus',source:'myExtension'},
-  'F1': {commandName:'LionCommand.open',when:'',source:'myExtension'},
-  'Escape': {commandName:'LionCommand.close',when:'',source:'myExtension'},
+  'F1': {commandName:'lioncommand.open',when:'',source:'myExtension'},
+  'Escape': {commandName:'lioncommand.close',when:'',source:'myExtension'},
 }  
 
 export function initKeybinds() {
@@ -41,10 +42,10 @@ function handleKeyDown(event) {
 
       //   executeCommand(command);
       if (command) {
-        window.lionAPI.callCommand(command.commandName);
+        lionAPI.lionCommand.call(command.commandName);
       }
 
-  event.preventDefault();
+  //  event.preventDefault();
 
 
   }

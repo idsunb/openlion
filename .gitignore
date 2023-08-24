@@ -4,4 +4,7 @@
 node_modules/
 *.log
 .webpack/
+.vite/
+out/
+esbuild/
 dist/

@@ -1,5 +1,7 @@
 import fs from 'fs';
-import path from 'path';
+import path, { parse } from 'path';
+import lionAPI from '../lionAPI/lionAPI';
+
 
 const installedExtensions = {};
 
@@ -78,30 +80,104 @@ console.log('extensionlist',extensionlist)
 
 
 
+  const parseConfig = (config,rootPath) => {
+
+
+    const Actions = {
+      js: () => {
+        lionAPI.lionCommand.call('infopanel.addmessage', 'js mode')
+        lionAPI.lionCommand.getCommands()
+        // 执行其他程序
+        // Actions[config.js.codes]();
+        'codes' in config || console.log('lack of codes')
+        ('activeEvents' in config.codes)?  Actions['activeEvents']():console.warn('lack of activeEvents') ;
+        ('commands' in config.codes)?  Actions['commands']():console.warn('lack of commands') ;
+        ('keybindings' in config.codes)?  Actions['keybindings']():console.warn('lack of keybindings') ;
+        ('menus' in config.codes)?  Actions['menus']():console.warn('lack of menus') ;
+
+
+        
+      },
+      webview: () => {
+        // 执行其他程序
+        console.log('webview------------');
+      },
+      // 添加其他属性...
+      activeEvents: () => {
+        console.log('activeEvents');
+        console.log('rootPath',rootPath);
+
+
+        // 执行其他程序
+      },
+
+      commands: () => {
+        console.log('commands');
+        // 执行其他程序
+      },
+      keybindings: () => {
+        console.log('keybindings');
+        // 执行其他程序
+      },
+      menus: () => {
+        console.log('menus');
+        // 执行其他程序
+      },
+      default: (arg) => {
+        console.log(`${arg} is not recognized`);
+      },
+    };
+
+    (Actions[config.mode] || Actions.default)("mode");
+
+  }
+
   const installExtension = (rootPath) => {
     //测试用
     if(rootPath == 'test') {
       return
     }
+    //从extension.json中读取配置
     const configPath = `${rootPath}\\extension.json`
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-    if(config.mode == 'js') {
-    addExtension(config);
+
+    parseConfig(config,rootPath)
+
+    // if('mode' in config ||  console.log('lack of mode') && config.mode == 'js' )
+    // {
+    //   console.log('iam the test ----------------')
+    // }
 
 
-      const test3  = "/chat3/a.js"
-    //webpack的bug，只能这么写
-    const myEx1 = import(`C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/${config.main}`)
+
+
+    // if(config.mode == 'js') {
+    // addExtension(config);
+    // const extensionPath = `${rootPath}\\${config.main}`
+    // const myEx1 = require(extensionPath)
+    // console.log('config',config);
+    // if(config.codes && config.codes.commands) {
+    //   console.log('commands',config.codes.commands)
+    // }
+
+
+
+
+
+
     // const m2 = require("c:/Users/Administrator/AppData/Roaming/openlion/extensions"+test3)
 
-    }
+    
+    // if (config.mode == 'webview') {
+    //   console.log('webview')
+    // }
 
 
   }
 
 
 
-  const installAllExtensions = () => {
+  export const installAllExtensions = () => {
     Object.keys(extensionlist).forEach((item) => {
       const path = extensionlist[item].path
       installExtension(path)
@@ -109,7 +185,7 @@ console.log('extensionlist',extensionlist)
     )
   }
 
-installAllExtensions()
+// installAllExtensions()
 
 console.log('installedExtensions',installedExtensions)
 

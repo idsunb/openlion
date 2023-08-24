@@ -8,7 +8,7 @@ const extension1 = {
     name: 'my-extension-test1',
   
     mode:'js',
-    args:{
+    codes:{
       activeEvents: [
         {
           onCommand: 'myExtension.myCommand',
@@ -45,7 +45,7 @@ const extension1 = {
       name: 'my-extension-test2',
   
       mode:'js',
-      args:{
+      codes:{
         activeEvents: [
           {
             onCommand: 'myExtension.myCommand',

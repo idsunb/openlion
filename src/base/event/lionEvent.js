@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron';
-import { web } from 'webpack';
 
 
 const EventEmitter = require('events');

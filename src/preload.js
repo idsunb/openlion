@@ -19,16 +19,21 @@ lionAPI.lionEvent.register('system.eventtest1', (data) => {
 });
 lionAPI.lionEvent.trigger('system.eventtest1',1234);
 
+window.lionAPIP = lionAPI;
+
+
 // //初始化快捷键
 initKeybinds();
 lionAPI.getkeybinds=getkeybinds;
 
-console.log(lionAPI.getPreloadFilePath())
+// console.log(lionAPI.getPreloadFilePath())
 
 // ipcRenderer.on('testback', (event, data) => {
 //   console.log('testback', data);
 // });
 
+
+ipcRenderer.send('sendID','preload')
 
 
 // path.join(__dirname, 'preload.js')
@@ -37,6 +42,9 @@ console.log(lionAPI.getPreloadFilePath())
 //   console.log('useContexttest', data);
 // }
 // );
+
+let chat_url = '';
+let chat_name = '';
 
 
 
@@ -52,12 +60,7 @@ window.myAPI = {
 
 process.myvalue = 42;
 
-lionAPI.registerCommand({name:'mainpanel.keybinding.panel.open', action:
-  () => {
-    console.log('mainpanel.keybinding.panel.open');
-  }
-});
-console.log('lionAPI',lionAPI.getCommands());
+
 
 
 window.addEventListener('load', (event) => {
@@ -68,7 +71,6 @@ window.addEventListener('unload', (event) => {
   console.log('did-stop-loading');
 });
 
-window.lionAPI = lionAPI;
 
 
 

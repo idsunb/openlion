@@ -7,7 +7,7 @@
   "publisher": "My Publisher",
   "name": "my-extension-test3",
   "mode": "js",
-  "args": {
+  "codes": {
       "activeEvents": [
           {
               "onCommand": "myExtension.myCommand",

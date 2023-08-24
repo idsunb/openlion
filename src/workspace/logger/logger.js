@@ -33,6 +33,9 @@ class Logger {
   }
 
 
+
+  
+
 //   const logger = new Logger('My Extension');
 
 // logger.log('Hello, world!');

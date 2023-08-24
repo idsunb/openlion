@@ -1,5 +1,4 @@
 import { ipcRenderer } from 'electron';
-import { copyFileSync } from 'fs';
 
 const EventEmitter = require('events');
 
@@ -16,11 +15,10 @@ class LionEvent {
     }
 
     register(name, handler) {
-        console.log('channel id', this.channelID);
-        console.log('registering local event', name);
+        console.warn('registering local event', name);
         if (this.lionEvents.listenerCount(name) == 0) {
             ipcRenderer.send('system.lionEvent.register', {name:name,channelID:this.channelID});
-            console.warn('system registered', name);
+            console.warn('system event registered', name);
         }
 
         

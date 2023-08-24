@@ -3,12 +3,27 @@
 const { app, BrowserWindow,webContents,Notification ,ipcMain,dialog,Menu,session } = require('electron');
 const path = require('path');
 const os = require('os')
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
-const { registerCommand, callCommand, getCommands } = require('./base/command/commands');
-import lionEvent from  './base/event/lionEvent';
-import { sources } from 'webpack';
+// import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-// console.log(path.join(os.homedir(), '\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi'));
+import lionAPI from './base/lionAPI/lionAPI';
+
+
+
+const { electronReloader} = require('electron-reloader')
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) {
+    app.quit();
+  }
+
+// electronReloader();
+try {
+  require('electron-reloader')(module,{});
+} catch (error) {}
+
+
+
+
+
 
 function showNotification ({title, body}) {
     new Notification({ title: title, body: body }).show()
@@ -31,6 +46,13 @@ function handleSetTitle(event, title) {
     const win = BrowserWindow.fromWebContents(webContents)
     win.setTitle(title)
 }
+function handleGetObject({name}) {
+  console.log('handleGetObject name',name);
+  return lionAPI.lionContext.getTestState();
+}
+
+
+
 
 const helloFromMain= ()=> {
     console.log('Hello from main process!')
@@ -52,16 +74,32 @@ const createWindows = async () => {
             // nodeIntegrationInWorker: true,
 
             // preload: path.join(__dirname, 'preload.js'),
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+            preload: path.join(__dirname, 'preload.js')
         },
     });
   // 加载 React 开发者工具
-//   const reactDevToolsPath = path.join(os.homedir(), '\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.28.0_0');
+  // const reactDevToolsPath = path.join(os.homedir(), '\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.28.0_0');
 
-//   await session.defaultSession.loadExtension(reactDevToolsPath)
-installExtension(REACT_DEVELOPER_TOOLS)
-.then((name) => console.log(`Added Extension:  ${name}`))
-.catch((err) => console.log('An error occurred: ', err));
+  // await session.defaultSession.loadExtension(reactDevToolsPath)
+// installExtension(REACT_DEVELOPER_TOOLS)
+// .then((name) => console.log(`Added Extension:  ${name}`))
+// .catch((err) => console.log('An error occurred: ', err));
+
+  // and load the index.html of the app.
+  // if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+
+  //for vite
+    mainWindow.loadURL("http://localhost:5180/");
+  // } else {
+  //   mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+  // }
+
+
+  //for esbuild 
+  // console.log('___dirname----------------------------',__dirname);
+  // mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  
 
 
 //设置菜单
@@ -85,52 +123,64 @@ installExtension(REACT_DEVELOPER_TOOLS)
     //   Menu.setApplicationMenu(menu)
 
     // mainWindow.loadURL('http://localhost:8088/index.html');
-    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+    // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
     // commandPanel.loadURL('http://localhost:8087/commandPanel.html');
     
 
     mainWindow.on('closed', () => {
         // windows = windows.filter(w => w !== mainWindow);
         // mainWindow = null;
-        cosole.log('closed');
         mainWindow = null;
     });
 
     mainWindow.webContents.on('dom-ready', () => {
         console.log('mainwindow dom-ready');
+        // mainWindow.webContents.send('chat.urlandname', {url:CHAT_EXTENSION_VITE_DEV_SERVER_URL, name:CHAT_EXTENSION_VITE_NAME});
+
       })
 
-    mainWindow.on('did-finish-load', () => {
-        console.log('did-finish-load');
-      }
-    );
+
 
     process.env.MY_VARIABLE = 'Hello Electron!';
    
-    // windows.push(mainWindow);
-    // mainWindow.webContents.openDevTools();
 
-    // mainWindow.webContents.send('setcommand', {registerCommand, callCommand, getCommands });
-    // mainWindow.webContents.send('setcommand', 1)
     mainWindow.webContents.openDevTools({ mode: 'detach' });
 
 
 }
 
+
+
+
+const initialContext = ()=>{
+  lionAPI.lionContext.mergeState({name:'lionContext',value:'hello from main'});
+  console.log('initialContext',lionAPI.lionContext.getState());
+
+
+}
+
+const initialCommand = ()=>{
+  
+  lionAPI.lionCommand.register({name:'system.shownotification',action:showNotification,type: 'system',source:'system'});
+
+  lionAPI.lionCommand.register({name:'system.openfile',action:handleFileOpen,type: 'system',source:'system'});
+
+  lionAPI.lionCommand.register({name:'hellofrommain', action:helloFromMain, type:'system',source:'system'});
+
+
+  lionAPI.lionCommand.register({name:'system.getobject',action:handleGetObject,type: 'system',source:'system'});
+
+
+  lionAPI.lionCommand.call('hellofrommain');
+}
+
+
+
 app.on('ready', () => {
     ipcMain.handle('dialog:openFile', handleFileOpen);
     ipcMain.on('set-title', handleSetTitle)
-    ipcMain.on('i am the test----', (event, arg) => {
-        console.log('i am the test----');
-        console.log(event.sender)
-    })
 
 
-    // ipcMain.on('callCommand', (event, {name,args}) => {
-    //     console.log('callCommand',name,args);
-    //     callCommand(name,args);
-    //     // callCommand(command.name, command.args);
-    //     });
 
 
 
@@ -139,31 +189,32 @@ app.on('ready', () => {
     });
     
     createWindows();
+    ipcMain.on('sendID', (event, data) => {
+        console.log('sendID', data,'id',event.sender.id);
 
-    // const id = Math.random().toString(36).substr(2, 9);
-    // const channel = `invokeRenderer-${id}`;
+    });
 
 
-    // ipcMain.on('test', (event, arg) => {
-    //     console.log('dom-ready',arg);
-    //     console.log('dom-ready received ');
-    // });
-    // mainWindow.webContents.once('test', (event, arg) => {
-    //     console.log('dom-ready',arg);
-    //     console.log('dom-ready received ');
-    // });
+
+
     
-    registerCommand({name:'system.showNotification',action:showNotification,type: 'system',source:'system'});
+    initialContext()
+    initialCommand()
 
-    registerCommand({name:'system.openfile',action:handleFileOpen,type: 'system',source:'system'});
 
-    registerCommand({name:'hellofrommain', action:helloFromMain, type:'system',source:'system'});
 
-    lionEvent.register('system.eventtest1',(data) => {
+  ipcMain.on('remove-state-by-id', (event, webContentsId) => {
+    console.log('remove-state-by-id', webContentsId);
+    // lionContext.deleteStateByID(webContentsId);
+  });
+  
+
+
+    lionAPI.lionEvent.register('system.eventtest1',(data) => {
         console.log('somethingHappenedfrommaintriger', data);
       }
     );
-    lionEvent.trigger('system.eventtest1', { data:"hello from main" });
+    lionAPI.lionEvent.trigger('system.eventtest1', { data:"hello from main" });
 
 
     
