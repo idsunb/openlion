@@ -7,7 +7,7 @@ import lionEvent from  '../event/lionEvent';
 
 
 
-const lionAPI = {
+const openlion = {
     // triggerEvent: triggerEvent,
     // registerEvent: registerEvent,
     lionCommand: {
@@ -34,4 +34,4 @@ const lionAPI = {
     },
 }
 
-export default lionAPI;
+export default openlion;

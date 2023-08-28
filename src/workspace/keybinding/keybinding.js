@@ -1,6 +1,6 @@
 const keybinds = {};
 // const lionAPI = window.lionAPI;
-import lionAPI from "../lionAPI/lionAPI";
+import openlion from "../lionAPI/openlion";
 
 const keybindInitialMap = {
   'Ctrl+S': {commandName:'save',when:'editorTextFocus',source:'myExtension'},
@@ -42,7 +42,7 @@ function handleKeyDown(event) {
 
       //   executeCommand(command);
       if (command) {
-        lionAPI.lionCommand.call(command.commandName);
+        openlion.lionCommand.call(command.commandName);
       }
 
   //  event.preventDefault();

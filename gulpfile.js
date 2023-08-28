@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const esbuild = require('gulp-esbuild');
 const { spawn } = require('child_process');
-
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 
 const path = require('path');
 // const htmlReplace = require('gulp-html-replace');
@@ -22,8 +22,9 @@ gulp.task('esbuildRenderer', function () {
       entryPoints: ['./src/index.jsx'],
       bundle: true,
       platform: 'node',
+      format: 'esm',
       target: ['es2022', 'node18'],
-      outfile: './index.js',
+      outfile: './index.mjs',
       loader: { '.js': 'jsx', '.css':'local-css' },
       external: ['electron'],
     }))
@@ -31,10 +32,43 @@ gulp.task('esbuildRenderer', function () {
 });
 
 gulp.task('esbuildMain', function () {
-  return gulp.src(['./src/main.js', './src/preload.js'])
+  return gulp.src(['./src/main.js'])
     .pipe(esbuild({
       bundle: true,
       format: 'cjs',
+      // format: 'esm',
+      outfile: 'main.js',
+      minify: true,
+      platform: 'node',
+      target: 'chrome89',
+      external: ['electron'],
+    }))
+    .pipe(gulp.dest('./esbuild'));
+});
+
+gulp.task('esbuildPreload', function () {
+  return gulp.src(['./src/preload.js'])
+    .pipe(esbuild({
+      bundle: true,
+      format: 'cjs',
+      // format: 'esm',
+      outfile: 'preload.js',
+      minify: true,
+      platform: 'node',
+      target: 'chrome89',
+      external: ['electron'],
+    }))
+    .pipe(gulp.dest('./esbuild'));
+});
+
+
+gulp.task('esbuildExtensionPreload', function () {
+  return gulp.src(['./src/extensionpreload.js'])
+    .pipe(esbuild({
+      bundle: true,
+      format: 'cjs',
+      // format: 'esm',
+      outfile: 'extensionpreload.js',
       minify: true,
       platform: 'node',
       target: 'chrome89',
@@ -50,17 +84,17 @@ gulp.task('esbuildMain', function () {
 
 
 
-
 gulp.task('buildex3', function () {
   return gulp.src('extensions/chatextension3/App.js')
     .pipe(esbuild({
-      target: ['es2022','node18'],
+      target: ['es2022','node18','chrome89'],
       platform: 'node',
-      outfile: 'App.js',
+      format: 'cjs',
       bundle: true,
       minify: true,
       loader:{ '.js': 'jsx' },
       external:['electron'],
+
     }))
     .pipe(gulp.dest('c:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension3\\'))
 
@@ -69,10 +103,29 @@ gulp.task('buildex3', function () {
 //   gulp.watch('extensions/chatextension3/*.js', gulp.series('build'));
 // });
 
-gulp.task('watchex3', function () {
-  gulp.watch('src/**/*.js', gulp.series('buildex3'));
+
+gulp.task('openlion', function () {
+  return gulp.src('src/workspace/lionAPI/openlion.js')
+    .pipe(esbuild({
+      target: ['es2022','node18'],
+      platform: 'node',
+      outfile: 'openlion.js',
+      bundle: true,
+      minify: true,
+      loader:{ '.js': 'jsx' },
+      external:['electron'],
+    }))
+    .pipe(gulp.dest('openlion'))
+
 });
 
+gulp.task('watchex3', function () {
+  gulp.watch(['extensions/chatextension3/**/*.js','src/**/*.js'], gulp.series('buildex3'));
+});
+
+gulp.task('watchExtensionPreload', function () {
+  gulp.watch(['src/extensionpreload.js'], gulp.series('esbuildExtensionPreload'));
+});
 // gulp.task('runE', shell.task([
 //   'electron esbuild/main.js'
 // ]));
@@ -105,13 +158,13 @@ function killProcess(pid, callback) {
 }
 
 gulp.task('watchrenderer', function () {
-  gulp.watch(['src/**/*.js','src/**/*.jsx','src/**/*.css','src/**/*.module.css'], gulp.series('esbuildRenderer'));
+  gulp.watch(['src/**/*.js','src/**/*.jsx','src/**/*.mjs','src/**/*.css','src/**/*.module.css'], gulp.series('esbuildRenderer'));
 });
 
   // gulp.watch(['src/main.js','src/base/**/*.js'], gulp.series('esbuildMain','runE'));
 
 gulp.task('watchmain', function () {
-  gulp.watch(['src/main.js','src/base/**/*.js'], gulp.series('esbuildMain' ));
+  gulp.watch(['src/main.js','src/main.mjs','src/base/**/*.js'], gulp.series('esbuildMain' ));
 });
 
 
@@ -128,7 +181,7 @@ gulp.task('hello', function(cb) {
     cb();
 });
 
-gulp.task('watch', gulp.parallel('watchex3', 'watchrenderer', 'watchmain'));
+gulp.task('watch', gulp.parallel('watchex3', 'watchExtensionPreload'));
 
 
 gulp.task('test', function () {
@@ -136,7 +189,7 @@ return gulp.src(['src/**/*.js','src/**/*.jsx','src/**/*.css','src/**/*.module.cs
   .pipe(gulp.dest('dist'));
 });
 
-exports.default = gulp.series('hello','copy','buildex3','runE','watch',); // 定义默认任务
+exports.default = gulp.series('hello','copy','watch'); // 定义默认任务
 
 
 

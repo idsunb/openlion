@@ -6,7 +6,7 @@ import styles from './MainPanel.module.css';
 import path from 'path';
 // const { registerEvent } = window.lionAPI;
 // const { registerCommand } = window.lionAPI;
-import lionAPI from '../../workspace/lionAPI/lionAPI';
+import openlion from '../../workspace/lionAPI/openlion';
 import KeybindingManager from '../keybindEdit/KeybindingManager';
 import { ipcRenderer } from 'electron';
 
@@ -140,8 +140,9 @@ const MainPanel = () => {
   //打开一个webview
   const handleOpenWebview = () => {
     console.log('handleOpenWebview');
-    // const preloadpath = 'D:\\文档\\codes\\openlion\\src\\extensionpreload.js';
-    const preloadpath = 'D:\\文档\\codes\\openlion\\.vite\\build\\extensionpreload.js';
+    const preloadpath = 'D:\\文档\\codes\\openlion\\esbuild\\extensionpreload.js';
+    // const preloadpath = 'D:\\文档\\codes\\openlion\\.vite\\build\\extensionpreload.js';
+
     console.log('preloadpath', preloadpath);
 
     // const testpath = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html';
@@ -297,10 +298,9 @@ const MainPanel = () => {
 
 
     // registerEvent('open-main-panel-tab', handleOpenNewTabPanelTest);
-    lionAPI.lionEvent.register('open-main-panel-tab', handleOpenNewTabPanelTest);
+    openlion.lionEvent.register('open-main-panel-tab', handleOpenNewTabPanelTest);
 
-    lionAPI.lionEvent.trigger('system.eventtest1', 3412);
-    lionAPI.lionCommand.register({
+    openlion.lionCommand.register({
       name: 'mainpanel.keybinding.panel.open', action:
         //测试用，以后可删
 
@@ -309,7 +309,7 @@ const MainPanel = () => {
 
         () => { handleOpenNewRactTabPanel({ title: '快捷键管理', componentname: 'KeybindingManager', })() }
     });
-    console.log('lionAPI', lionAPI.lionCommand.getCommands())
+    console.log('lionAPI', openlion.lionCommand.getCommands())
 
     return () => {
       window.removeEventListener('message');
@@ -365,7 +365,6 @@ const MainPanel = () => {
 
             <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].openDevTools(); }}>打开webview 开发者工具</button>
             <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].closeDevTools(); }}>关闭webview 开发者工具</button>
-            <button onClick={() => { console.log(document.getElementsByName(`webview-${id}`)[0].getWebContentsId()) }}>得到id</button>
 
           </TabPanel>
         );

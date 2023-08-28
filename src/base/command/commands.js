@@ -25,6 +25,7 @@ export const registerCommand = ({ name, action, type , source = 'system' ,title}
     return;
   }else{
   commands[0][name] = action;
+  lionContext.mergeState({ commands: { [name]: { type: "system",title:title } } });
   }
   // if(type === 'system'){
 
@@ -156,6 +157,8 @@ ipcMain.handle('registerCommand', (event, { command, commandID }) => {
   }else{
     // 否则注册
     commands[commandID][command.name] = command.action;
+    // lionContext.mergeState({ commands: { [command.name]: { type: command.type, title: command.title } } });
+
     console.log('registercommand----------------', commands);
 
     return 'success';
@@ -192,14 +195,14 @@ ipcMain.handle('registerCommand', (event, { command, commandID }) => {
 
 
 
-// //处理远端callCommand
-// ipcMain.handle('callCommand', async (event, { name, args }) => {
+//处理远端callCommand
+ipcMain.handle('callCommand', async (event, { name, args }) => {
 
-//   console.log('system callCommand', name, args);
-//   const result = await callCommand(name, args);
-//   return result;
-//   // callCommand(command.name, command.args);
-// });
+  console.log('system callCommand', name, args);
+  const result = await callCommand(name, args);
+  return result;
+  // callCommand(command.name, command.args);
+});
 
 
 //旧版本函数
@@ -247,6 +250,7 @@ ipcMain.on('commands', (event,data) => {
 
 
   port.on('close', () => {  
+    console.log('port closed commands');
     delete commands[commandID];
     portMap.delete(port);
     // console.log(`port closed `,data);

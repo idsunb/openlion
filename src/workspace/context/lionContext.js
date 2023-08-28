@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 const _ = require('lodash');
-
+import lionEvent from '../event/lionEvent';
 
 const id = Math.random().toString(36).substring(2, 9);
 const contextID = `context-${id}`;
@@ -15,9 +15,11 @@ const port2 = channel.port2
 
 const onMessageHandler = async (event) => {
     const message = event.data;
+    // console.log('here i receive message', message);
     if(message.type==='updateState'){
-        // console.log('lioncontext  state',{...message});
         // port2.postMessage('success');
+        
+
         lionContext.states = message.states;
     }
 
@@ -27,39 +29,16 @@ const onMessageHandler = async (event) => {
 
 port2.addEventListener('message', onMessageHandler);
 
-function sendMessage(message) {
-    return new Promise((resolve) => {
-      port2.onmessage = (event) => {
-        resolve(event.data);
-      };
-      port2.postMessage(message);
-    });
-  }
+
 
 
 
 ipcRenderer.postMessage('lionport', {contextID:contextID}, [port1])
 
 
+port2.start();
 
 
-
-//   function sendMessage(message) {
-//     return new Promise((resolve, reject) => {
-//       const onMessage = (event) => {
-//         if (event.data.error) {
-//           reject(event.data.error);
-//         } else {
-//           resolve(event.data);
-//         }
-//         port2.removeEventListener('message', onMessage);
-//       };
-//       port2.addEventListener('message', onMessage);
-//       console.log('here',message);
-
-//       port2.postMessage(message);
-//     });
-//   }
 
 
 
@@ -68,14 +47,6 @@ export const lionContext =
 {
     states:{},
 
-    update: async ()=>{
-
-        const result = await sendMessage({type:'getState',contextID:contextID})
-        // console.log('lioncontext update result',{...result});
-        // console.log('result2',result2);
-        lionContext.states = Object.assign({}, result);
-        // console.log('lioncontext update states',lionContext.getState());
-    },
 
 
         init: async () => {
@@ -84,10 +55,14 @@ export const lionContext =
 
         setState: async (newState) => {
             await lionContext.waitForInit();
+
             port2.postMessage({ type: 'setState', contextID: contextID, newState: newState });
         },
 
         mergeState: async (newState) => {
+            lionEvent.trigger('mergeState', newState);
+
+
             await lionContext.waitForInit();
             port2.postMessage({ type: 'mergeState', contextID: contextID, newState: newState });
         },
@@ -101,15 +76,24 @@ export const lionContext =
             return mergedObject
         },
 
+        getTestState: () => {
+            return lionContext.states;
+        },
+
         waitForInit: async () => {
+            // console.log('waitForInit',lionContext.initPromise);
             if (!lionContext.initPromise) {
                 lionContext.initPromise = lionContext.init();
+                await lionContext.initPromise;
+
             }
-            await lionContext.initPromise;
         },
 
         update: async () => {
-            const result = await sendMessage({ type: 'getState', contextID: contextID });
+            // const result = await sendMessage({ type: 'getState', contextID: contextID });
+            const result = await ipcRenderer.invoke('context.getState', { contextID: contextID });
+
+
             lionContext.states = Object.assign({}, result);
         },
     
@@ -117,10 +101,13 @@ export const lionContext =
 
 }
 
-lionContext.waitForInit().then(() => {
-    console.log('lioncontext in here',lionContext.getState())
-});
 
+
+lionEvent.register('extension.port.close', (data) => {
+    console.log('extension.port.close  context', data);
+    port2.close();
+}   
+);
 
 // lionContext.init();
 

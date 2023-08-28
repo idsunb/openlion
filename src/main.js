@@ -1,11 +1,12 @@
 
 
-const { app, BrowserWindow,webContents,Notification ,ipcMain,dialog,Menu,session } = require('electron');
-const path = require('path');
-const os = require('os')
+import { app, BrowserWindow,webContents,Notification ,ipcMain,dialog,Menu,session } from 'electron';
+import path from 'path';
+// const os = require('os')
+import os from 'os';
 // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-import lionAPI from './base/lionAPI/lionAPI';
+import openlion from './base/lionAPI/openlion';
 
 
 
@@ -48,7 +49,13 @@ function handleSetTitle(event, title) {
 }
 function handleGetObject({name}) {
   console.log('handleGetObject name',name);
-  return lionAPI.lionContext.getTestState();
+
+  if(name=='event')
+    return JSON.stringify(openlion.lionEvent.eventGroup);
+  if(name=='command')
+    return JSON.stringify(openlion.lionCommand.getCommands());
+  if(name=='context')
+    return JSON.stringify(openlion.lionContext.getTestState());
 }
 
 
@@ -153,25 +160,25 @@ const createWindows = async () => {
 
 
 const initialContext = ()=>{
-  lionAPI.lionContext.mergeState({name:'lionContext',value:'hello from main'});
-  console.log('initialContext',lionAPI.lionContext.getState());
+  openlion.lionContext.mergeState({name:'lionContext',value:'hello from main'});
+  console.log('initialContext',openlion.lionContext.getState());
 
 
 }
 
 const initialCommand = ()=>{
   
-  lionAPI.lionCommand.register({name:'system.shownotification',action:showNotification,type: 'system',source:'system'});
+  openlion.lionCommand.register({name:'system.shownotification',action:showNotification,type: 'system',source:'system'});
 
-  lionAPI.lionCommand.register({name:'system.openfile',action:handleFileOpen,type: 'system',source:'system'});
+  openlion.lionCommand.register({name:'system.openfile',action:handleFileOpen,type: 'system',source:'system'});
 
-  lionAPI.lionCommand.register({name:'hellofrommain', action:helloFromMain, type:'system',source:'system'});
-
-
-  lionAPI.lionCommand.register({name:'system.getobject',action:handleGetObject,type: 'system',source:'system'});
+  openlion.lionCommand.register({name:'hellofrommain', action:helloFromMain, type:'system',source:'system'});
 
 
-  lionAPI.lionCommand.call('hellofrommain');
+  openlion.lionCommand.register({name:'system.getobject',action:handleGetObject,type: 'system',source:'system'});
+
+
+  openlion.lionCommand.call('hellofrommain');
 }
 
 
@@ -210,11 +217,11 @@ app.on('ready', () => {
   
 
 
-    lionAPI.lionEvent.register('system.eventtest1',(data) => {
-        console.log('somethingHappenedfrommaintriger', data);
+    openlion.lionEvent.register('system.eventtest1',(data) => {
+        console.log('system.eventtest1 system', data);
       }
     );
-    lionAPI.lionEvent.trigger('system.eventtest1', { data:"hello from main" });
+    openlion.lionEvent.trigger('system.eventtest1', 'system');
 
 
     

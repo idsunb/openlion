@@ -1,0 +1,11 @@
+{
+    "name": "openlion",
+    "version": "1.0.0",
+    "description": "A package for my common API",
+    "main": "openlion.js",
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "lionapi": "^1.0.0"
+    }
+}

@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 // import TopBar from './TopBar';
 // import NavBar from './NavBar';
 // import SideBar from './SideBar';
-import lionAPI from './workspace/lionAPI/lionAPI';
+import openlion from './workspace/lionAPI/openlion';
 
 
 import LeftSidePanel from './parts/leftpanel/LeftSidePanel';
@@ -16,7 +16,10 @@ import RightSidePanel from './parts/rightpanel/RightSidePanel';
 import styles from './App.module.css';
 import {MyContextProvider} from './MyContext';
 import LionCommand from './parts/lioncommand/LionCommand';
-
+// import openlion from './workspace/lionAPI/openlion';
+import {initKeybinds, getkeybinds} from './workspace/keybinding/keybinding';
+initKeybinds();
+openlion.getkeybinds=getkeybinds;
 
 
 // // 启用 React 开发者工具

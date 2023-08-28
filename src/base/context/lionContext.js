@@ -29,6 +29,8 @@ export const lionContext = {
         console.warn("mergeState", lionContext.states);
     },
     setStateByID: async (id, newState) => {
+        lionContext.states[id] = { ...lionContext.states[id], ...newState };
+
         for (const [key, value] of portMap.entries()) {
             await key.postMessage({
                 type: "updateState",
@@ -37,10 +39,11 @@ export const lionContext = {
             });
         }
 
-        lionContext.states[id] = { ...lionContext.states[id], ...newState };
 
     },
     mergeStateByID: async (id, newState) => {
+                lionContext.states[id] = _.merge(lionContext.states[id], newState);
+
         for (const [key, value] of portMap.entries()) {
             await key.postMessage({
                 type: "updateState",
@@ -48,13 +51,20 @@ export const lionContext = {
                 contextID: value,
             });
         }
-        lionContext.states[id] = _.merge(lionContext.states[id], newState);
     },
     deleteAllState: () => {
         lionContext.states = {};
     },
-    deleteStateByID: (id) => {
+    deleteStateByID: async (id) => {
+
         delete lionContext.states[id];
+        for (const [key, value] of portMap.entries()) {
+            await key.postMessage({
+                type: "updateState",
+                states: lionContext.states,
+                contextID: value,
+            });
+        }
     },
     getState: () => {
         const valuesArray = Object.values(lionContext.states); // 获取原对象的值并转为数组
@@ -80,15 +90,9 @@ export const lionContext = {
 
 
 
-
-function sendMessage(message) {
-    return new Promise((resolve) => {
-      port2.onmessage = (event) => {
-        resolve(event.data);
-      };
-      port2.postMessage(message);
-    });
-  }
+ipcMain.handle('context.getState', async (event, data) => {
+    return lionContext.states;
+});
 
 
 const portMap = new Map();
@@ -101,6 +105,7 @@ ipcMain.on('lionport', (event,data) => {
   const port = event.ports[0]
   const contextID = data.contextID;
   portMap.set(port,contextID)
+  lionContext.states[contextID] = {};
 
 
 
@@ -110,6 +115,7 @@ ipcMain.on('lionport', (event,data) => {
     if (message.type === 'getState') {
     //   const newState = message.payload;
       // 执行更新状态的操作
+      console.log('here i receive getState and send states',lionContext.states);
       port.postMessage(lionContext.states);
     }
     if (message.type === 'setState') {
@@ -130,11 +136,11 @@ ipcMain.on('lionport', (event,data) => {
 
   })
 
-
+//删除,需要删除后,及时通知更新
   port.on('close', () => {  
-    lionContext.deleteStateByID(portMap.get(port));
     portMap.delete(port);
-    // console.log(`port closed `,data);
+    lionContext.deleteStateByID(contextID);
+    console.log(`port closed context `);
   })
   // MessagePortMain 阻塞消息直到 .start() 方法被调用
   port.start()

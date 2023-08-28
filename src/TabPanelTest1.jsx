@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import lionAPI from './workspace/lionAPI/lionAPI';
+import openlion from './workspace/lionAPI/openlion';
 
 const TabPanelTest1 = () => {
   //   const setButtonRef = useRef(null);
@@ -68,7 +68,7 @@ const TabPanelTest1 = () => {
     }
 
 
-    lionAPI.onUpdateCounter((_event, value) => {
+    openlion.onUpdateCounter((_event, value) => {
       const oldValue = Number(itemnumber);
       const newValue = oldValue + value;
       setitemnumber(newValue);

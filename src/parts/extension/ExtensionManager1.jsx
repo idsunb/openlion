@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { installAllExtensions } from "../../workspace/extension/extension";
 import { lionContext } from "../../workspace/context/lionContext";
-import lionAPI from "../../workspace/lionAPI/lionAPI";
+import openlion from "../../workspace/lionAPI/openlion";
 
 lionContext.setState({a:1})
 

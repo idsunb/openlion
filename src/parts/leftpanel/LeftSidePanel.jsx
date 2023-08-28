@@ -8,7 +8,7 @@ import { MyTabs, Tab, TabList, TabPanel } from '../../tabs/MyTabs';
 import ExtensionManager from '../extension/ExtensionManager';
 import ExtensionManager1 from '../extension/ExtensionManager1';
 import SettingManagerUI from '../../setting/SettingManagerUI';
-import lionAPI from '../../workspace/lionAPI/lionAPI';
+import openlion from '../../workspace/lionAPI/openlion';
 import { set } from 'lodash';
 
 
@@ -24,7 +24,7 @@ const LazyExtensionManager1 = lazy(() => import('../extension/ExtensionManager1'
 
 
 const LeftSidePanel = () => {
-  const [objItem, setObjItem] = useState("");
+  const [objItem, setObjItem] = useState("event");
 
   
   
@@ -40,7 +40,7 @@ const LeftSidePanel = () => {
     //   };
 
       const handleAddTab = () => {
-         const path = lionAPI.getfilepath()
+         const path = openlion.getfilepath()
          console.log(path);
         // onAddTab('New Tab');
         // setTabIndex(tabIndex + 1);
@@ -67,12 +67,12 @@ const LeftSidePanel = () => {
         // console.log(path);
       }
       const handleTest = () => {
-        console.log(lionAPI.myvalue())
+        console.log(openlion.myvalue())
 
       }
       const handleClickEvent = () => {
 
-        lionAPI.lionCommand.call('system.showNotification',{title:'you are a title',body:'you are a body'});
+        openlion.lionCommand.call('system.showNotification',{title:'you are a title',body:'you are a body'});
 
         // console.log('handleClickEvent');
         // lionAPI.lionEvent.register('lefttest1', (data) => {
@@ -88,29 +88,28 @@ const LeftSidePanel = () => {
 
       const handleEventregister = () => {
         console.log('handleEventregister')
-        lionAPI.lionEvent.register('system.eventtest1', (data) => {
+        openlion.lionEvent.register('system.eventtest1', (data) => {
           console.log('system.eventtest1', data);
         });
       }
       const handleEventtrigger = () => {
         console.log('handleEventtrigger');
-        console.log('alittltetest');
-        lionAPI.lionEvent.trigger('system.eventtest1',9999);
+        openlion.lionEvent.trigger('system.eventtest1','leftpanel');
       }
       const handleEventlook = () => {
         console.log('handleEventlook');
-        console.log(lionAPI.lionEvent.getLionEvents());
+        console.log(openlion.lionEvent.getLionEvents());
       }
 
       const hellomain = () => {
         console.log('hellomain');
-        console.log(lionAPI.lionCommand.getCommands());
-        lionAPI.lionCommand.call('hellofrommain');
+        console.log(openlion.lionCommand.getCommands());
+        openlion.lionCommand.call('hellofrommain');
       }
 
       const handleInfoPanel = () => {
         console.log('handleInfoPanel');
-        lionAPI.lionCommand.call('infopanel.addmessage',{a:4});
+        openlion.lionCommand.call('infopanel.addmessage',{a:4});
       }
       
       const handleInputChange = (event) => {
@@ -118,15 +117,15 @@ const LeftSidePanel = () => {
       };
 
       const handleSendEvent = async () => {
-        console.log('objitem',objItem);
-        const result = await lionAPI.lionCommand.call('system.getobject',{name:objItem});
-        lionAPI.lionCommand.call('infopanel.addmessage',result);
-        console.log('result',result);
+        const result = await openlion.lionCommand.call('system.getobject',{name:objItem});
+        openlion.lionCommand.call('infopanel.addmessage',result);
+        
+        console.log('result',JSON.parse(result));
       };
       const handleGetState = () => {
         console.log('handleGetState');
-        console.log(lionAPI.lionContext.getState());
-        lionAPI.lionCommand.call('infopanel.addmessage',lionAPI.lionContext.getState());
+        console.log(openlion.lionContext.getTestState());
+        openlion.lionCommand.call('infopanel.addmessage',openlion.lionContext.getState());
       }
 
 
@@ -158,16 +157,20 @@ return (
       <button onClick={  handleclear }>Clear State</button>
       <button onClick={handlePath}>路径</button>
       <button onClick={handleTest}>测试</button>
-      <button onClick={handleEventregister}>注册事件</button>
-      <button onClick={handleEventtrigger}>触发事件</button>
+      <button onClick={handleEventregister}>注册system.eventtest1事件</button>
+      <button onClick={handleEventtrigger}>触发system.eventtest1事件</button>
       <button onClick={handleEventlook}>查看事件</button>
       <button onClick={handleClickEvent}>点击事件</button>
       <button onClick={hellomain}>测试是否获得main的command</button>
       <button onClick={handleInfoPanel}>测试信息面板</button>
       <br/>
       <div>
-          <input value={objItem} onChange={handleInputChange} />
-          <button onClick={handleSendEvent}>发送所需要对象</button>
+          <select value={objItem} onChange={handleInputChange}>
+            <option value="event">event</option>
+            <option value="command">command</option>
+            <option value="context">context</option>
+          </select>
+          <button onClick={handleSendEvent}>发送</button>
         </div>
 
         <br/>
@@ -188,7 +191,7 @@ return (
         </TabPanel>
         <TabPanel>
         <h2>快捷键管理</h2>
-        <button onClick={()=>{lionAPI.lionCommand.call('mainpanel.keybinding.panel.open')}}>打开快捷键管理</button>
+        <button onClick={()=>{openlion.lionCommand.call('mainpanel.keybinding.panel.open')}}>打开快捷键管理</button>
         </TabPanel>
         <TabPanel>
         <h2>设置</h2>

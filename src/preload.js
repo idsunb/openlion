@@ -8,23 +8,22 @@ import path from 'path';
 // import { triggerEvent } from './lionevent/LionEvent';
 // import { triggerEvent, registerEvent } from './lionevent/LionEvent';
 // import { registerCommand, getCommands, callCommand } from './workspace/command/commands';
-import {initKeybinds, getkeybinds} from './workspace/keybinding/keybinding';
+// import {initKeybinds, getkeybinds} from './workspace/keybinding/keybinding';
 
-import lionAPI from './workspace/lionAPI/lionAPI';
+// import openlion from './workspace/lionAPI/openlion';
 // import lionEvent from './workspace/event/lionEvent';
 
 // console.log('-----');
-lionAPI.lionEvent.register('system.eventtest1', (data) => {
-  console.log('system.eventtest1', data);
-});
-lionAPI.lionEvent.trigger('system.eventtest1',1234);
 
-window.lionAPIP = lionAPI;
+// window.lionAPIP = openlion;
 
+
+
+// openlion.lionCommand.register({name:'test',action:() => {console.log('test from preload')}});
 
 // //初始化快捷键
-initKeybinds();
-lionAPI.getkeybinds=getkeybinds;
+// initKeybinds();
+// openlion.getkeybinds=getkeybinds;
 
 // console.log(lionAPI.getPreloadFilePath())
 
@@ -33,7 +32,7 @@ lionAPI.getkeybinds=getkeybinds;
 // });
 
 
-ipcRenderer.send('sendID','preload')
+// ipcRenderer.send('sendID','preload')
 
 
 // path.join(__dirname, 'preload.js')

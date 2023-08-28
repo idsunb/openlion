@@ -1,13 +1,17 @@
-
 import lionEvent from '../event/lionEvent';
+
+import { lionContext } from '../context/lionContext';
+
+
+
 
 import { ipcRenderer } from 'electron';
 
 import { registerCommand, getCommands, callCommand } from '../command/commands';
 
-import { lionContext } from '../context/lionContext';
+import {lionExtension} from '../extension/extension';
 
-
+export { lionExtension } from '../extension/extension';
 // console.log(registerCommand, getCommands, callCommand);
 
 
@@ -20,7 +24,7 @@ import { lionContext } from '../context/lionContext';
 
 
 
-const lionAPI = {
+const openlion = {
     // triggerEvent: triggerEvent,
     // registerEvent: registerEvent,
     lionCommand: {
@@ -33,6 +37,7 @@ const lionAPI = {
         setState:lionContext.setState,
         mergeState:lionContext.mergeState,
         getState:lionContext.getState,
+        getTestState:lionContext.getTestState,
 
     },
 
@@ -44,11 +49,18 @@ const lionAPI = {
         remove: lionEvent.remove.bind(lionEvent),
         getLionEvents: lionEvent.getLionEvents.bind(lionEvent),
     },
-    getWebcontentsID: () => {
-        return webContentsID;
 
-        // return ipcRenderer.id;
+    lionExtension:
+    {
+        setName: lionExtension.setName.bind(lionExtension),
+        active: lionExtension.active.bind(lionExtension),
+        deactive: lionExtension.deactive.bind(lionExtension),
+        start: lionExtension.start.bind(lionExtension),
+        die:lionExtension.die.bind(lionExtension)
+
+
     },
+
 
     setTitle: (title) => {
         ipcRenderer.send('set-title', title);
@@ -97,10 +109,8 @@ const lionAPI = {
 
 
 
-export default lionAPI;
+export default openlion;
 
 
-module.exports = lionAPI;
+module.exports = openlion;
 
-
-console.log('lionAPI context',lionContext.getState() );

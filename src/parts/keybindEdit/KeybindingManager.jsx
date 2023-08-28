@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { getkeybinds } from '../../workspace/keybinding/keybinding';
 
-const keybinds = lionAPIP.getkeybinds();
+const keybinds = getkeybinds();
 
 
 const KeybindingManager = () => {

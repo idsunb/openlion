@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { lionContext } from '../context/lionContext';
+import lionEvent from '../event/lionEvent';
 
 const id = Math.random().toString(36).substring(2, 9);
 const commandID = `command-${id}`;
@@ -29,9 +30,9 @@ commands[commandID]={}
 
 port2.addEventListener('message', async (event) => {
   const message = event.data;
-  console.log('here i receive message', message);
+  // console.log('here i receive message', message);
   if (message.type === 'callCommand') {
-    console.log('here i receive callCommand');
+    // console.log('here i receive callCommand');
     const { type,name, args, commandID: id } = message;
     if (id == commandID) {
       try {
@@ -84,12 +85,15 @@ export const registerCommand = async ({ name, action, type = 'renderer', source 
     return;
   }
 
+  // console.log(`register `,commands);
+
   //先向系统注册，如果系统没有重复，则注册本地命令
 
   try{
   const result = await ipcRenderer.invoke('registerCommand', { command: { name: name, action: '', type: 'renderer', source: source, title: title }, commandID: commandID });
   if (result == 'success') {
     commands[commandID][name] = action;
+    lionContext.mergeState({ commands: { [name]: { type: type,title: title }} });
     console.warn(`register command:${name}, success commands:`, commands);
   } else {
     console.warn(`register command:${name} failed because of ${result}`);
@@ -161,15 +165,15 @@ export const callCommand = async (name, args) => {
   //   return result;
 
   // }
-  console.log('call command',name);
-  console.log('commands',commands[commandID]);
-  console.log('-------')
+  // console.log('call command',name);
+  // console.log('commands',commands[commandID]);
+  // console.log('-------')
   if(name in commands[commandID]){
     console.warn(`call command :call local command name:${name}`);
     const result = await commands[commandID][name](args);
     return result;
   }else{
-    console.warn('call command: not exist command,called from remote, command name:', name);
+    console.warn('call command: not exist command,called remote command, command name:', name);
     const result = await ipcRenderer.invoke('callCommand', { name, args })
     return result;
   }
@@ -205,6 +209,16 @@ export const getCommands = () => {
   return commands;
 
 }
+
+
+lionEvent.register('extension.port.close', (data) => {
+  console.log('extension.port.close  command', data);
+  // console.log('portMap', portMap);
+  port2.close();
+}
+);
+
+
 
 // //监听main进程的callCommand消息，如果有，则调用本地的callCommand
 // ipcRenderer.on('callCommand', async (event, { name, args, commandID: id }) => {

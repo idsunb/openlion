@@ -2,11 +2,61 @@ import { ipcRenderer } from 'electron';
 
 const EventEmitter = require('events');
 
+const id = Math.random().toString(36).substring(2, 9);
+const eventID = `event-${id}`;
+
+
+
+
+
+const channel = new MessageChannel()
+const port1 = channel.port1
+const port2 = channel.port2
+
+
+ipcRenderer.postMessage('events', {eventID:eventID}, [port1])
+
+port2.addEventListener('message', async (event) => {
+    const message = event.data;
+    console.log('here i receive message', message);
+
+    if (message.type === 'triggerEvent') {
+        const { type,name, args, eventID: id } = message;
+        if (id == eventID) {
+            lionEvent.triggerLocal(name, args);
+        }
+    }
+});
+
+port2.start();
+
+
+
+
+
 class LionEvent {
     constructor() {
         this.lionEvents = new EventEmitter();
-        const id = Math.random().toString(36).substring(2, 9);
-        this.channelID = `invokeRenderer-${id}`;
+        
+        // const channel = new MessageChannel()
+        // const port1 = channel.port1
+        // this.port2 = channel.port2
+        // ipcRenderer.postMessage('events', { eventID: eventID }, [port1])
+
+        // this.port2.addEventListener('message', async (event) => {
+        //     const message = event.data;
+        //     console.log('here i receive message', message);
+
+        //     if (message.type === 'triggerEvent') {
+        //         const { type, name, args, eventID: id } = message;
+        //         if (id == eventID) {
+        //             lionEvent.triggerLocal(name, args);
+        //         }
+        //     }
+        //     this.port2.start();
+
+        // });
+
     }
 
     getLionEvents() {
@@ -17,24 +67,34 @@ class LionEvent {
     register(name, handler) {
         console.warn('registering local event', name);
         if (this.lionEvents.listenerCount(name) == 0) {
-            ipcRenderer.send('system.lionEvent.register', {name:name,channelID:this.channelID});
-            console.warn('system event registered', name);
-        }
+            // ipcRenderer.send('lionEvent.register', {name:name,eventID:eventID});
+            // console.warn('system event registered', name);
+            // try {
+            // const result = ipcRenderer.invoke('registerEvent', {name:name,eventID:eventID});
+            // if(result=='success'){
+            //     console.warn('system event registered', name);
+            // }else{
+            //     console.warn('system event register failed', result);
+            // } 
+            // } catch (error) {
+            //     console.warn('system event register failed error:', error);
+            // }
+            port2.postMessage({ type: 'registerEvent', name: name, eventID: eventID });
 
-        
+
+        }
 
         this.lionEvents.on(name, handler);
         console.log(this.lionEvents);
     }
 
-    
-    trigger(name, data) {
-        console.log(`call triggering event to system channelid:${this.channelID}`, name, data);
-        console.log(this.lionEvents);
 
-        ipcRenderer.send('system.lionEvent.trigger', name, data);
+    trigger(name, args) {
+        console.log(`trigger remote event ${eventID}:`, name, args, this.lionEvents);
 
-        
+        ipcRenderer.send('triggerEvent', { name: name, eventID: eventID, args: args });
+
+
         // // 如果本地有监听，先触发本地的监听，如果没有，再触发主进程的监听
         // if (this.lionEvents.listenerCount(name) > 0) {
         //     this.lionEvents.emit(name, data);
@@ -44,7 +104,6 @@ class LionEvent {
 
     triggerLocal(name, data) {
         console.log('triggering local event', name, data);
-        console.log(this.lionEvents);
         this.lionEvents.emit(name, data);
     }
 
@@ -55,18 +114,26 @@ class LionEvent {
     }
 }
 
-ipcRenderer.on('fromsystem.lionEvent.trigger', (event, {name,channelID, data}) => {
+// ipcRenderer.on('fromsystem.lionEvent.trigger', (event, {name,eventID, data}) => {
 
-    if(lionEvent.channelID == channelID){
-        console.log(`fromsystem.lionEvent.trigger name:${name} channelID:${channelID},data:${data}`, );
-        lionEvent.triggerLocal(name, data);
-    }
+//     if(lionEvent.eventID == eventID){
+//         console.log(`fromsystem.lionEvent.trigger name:${name} eventID:${eventID},data:${data}`, );
+//         lionEvent.triggerLocal(name, data);
+//     }
 
-}
-);
+// }
+// );
 
 
 const lionEvent = new LionEvent();
+
+
+lionEvent.register('extension.port.close', (data) => {
+    console.log('extension.port.close event response', data);
+    // const { port } = data;
+    port2.close();
+    // port.close();
+});   
 
 
 export default lionEvent;

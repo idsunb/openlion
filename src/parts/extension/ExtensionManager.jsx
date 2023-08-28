@@ -2,10 +2,10 @@ import React, { useState, useEffect, useReducer } from 'react';
 import app from 'electron';
 import fs from 'fs';
 import path from 'path';
-import lionAPI from '../../workspace/lionAPI/lionAPI';
+import openlion from '../../workspace/lionAPI/openlion';
 
 
-const extensionsPath = lionAPI.getExtensionPath();
+const extensionsPath = openlion.getExtensionPath();
 
 
 const extensionInitialState = {
@@ -119,7 +119,7 @@ const ExtensionManager = () => {
           cmds.forEach((cmd, index) => {
             console.log('cmd', cmd);
             //注册命令
-            lionAPI.lionCommand.register({name:cmd, action:() => { console.log('cmd', cmd); lionAPI.openMainPanelTab({ name: extensionJsonInfo.pluginName, path: mainPath }) }
+            openlion.lionCommand.register({name:cmd, action:() => { console.log('cmd', cmd); openlion.openMainPanelTab({ name: extensionJsonInfo.pluginName, path: mainPath }) }
           });
           })
 
