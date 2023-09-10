@@ -7,8 +7,7 @@ import ReactDOM from 'react-dom';
 // import NavBar from './NavBar';
 // import SideBar from './SideBar';
 import openlion from './workspace/lionAPI/openlion';
-
-
+openlion.lionContext.setConfig({name:'Main App',version:'0.0.1'});
 import LeftSidePanel from './parts/leftpanel/LeftSidePanel';
 import MainPanel from './parts/main/MainPanel';
 import RightSidePanel from './parts/rightpanel/RightSidePanel';

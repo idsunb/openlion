@@ -51,7 +51,6 @@ import openlion from '../../workspace/lionAPI/openlion';
       case 'SET_FILTERED_COMMANDS':
         return { ...state, filteredCommands: action.payload };
       case 'SET_COMMANDS':
-        console.log('commandReducer',action.payload);
         return { ...state, commands: action.payload };
       default:
         throw new Error(`Unhandled action type: ${action.type}`);
@@ -139,7 +138,7 @@ function LionCommand(props) {
 
     
     dispatch({ type: 'SET_COMMANDS', payload: openlion.lionContext.getState()['commands'] });
-    console.log('LionCommand useEffect',state.commands);
+    console.log("🚀 ~ file: LionCommand.jsx:143 ~ useEffect ~ state.commands:", state.commands)
 
     openlion.lionEvent.register('command.open', () => {
     setFilteredCommands(openlion.lionContext.getState()['commands']);

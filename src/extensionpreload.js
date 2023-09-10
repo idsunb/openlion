@@ -1,14 +1,11 @@
 
-const { contextBridge,ipcRenderer,app  } = require('electron');
 // import lionEvent from './workspace/event/lionevent';
 import openlion from './workspace/lionAPI/openlion';
 
 
+window.openlion = openlion;
 
-ipcRenderer.send('sendID','no')
-
-
-
+// ipcRenderer.send('sendID','no')
 
 
 // const lionAPI = {
@@ -54,11 +51,11 @@ ipcRenderer.send('sendID','no')
 //   };
 
 
-  contextBridge.exposeInMainWorld('openlion', openlion);
+  // contextBridge.exposeInMainWorld('openlion', openlion);
 
 
-  contextBridge.exposeInMainWorld('sayhello', {
-    sayHello: () => {
-      console.log('Hello from myAPI!');
-    },
-  });
+  // contextBridge.exposeInMainWorld('sayhello', {
+  //   sayHello: () => {
+  //     console.log('Hello from myAPI!');
+  //   },
+  // });

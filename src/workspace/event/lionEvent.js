@@ -1,4 +1,5 @@
-import { ipcRenderer } from 'electron';
+// import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron');
 
 const EventEmitter = require('events');
 
@@ -21,6 +22,10 @@ port2.addEventListener('message', async (event) => {
     console.log('here i receive message', message);
 
     if (message.type === 'triggerEvent') {
+        if(!lionEvent.active){
+            console.log("🚀 ~ file: lionEvent.js:25 ~ LionEvent ~ trigger ~ can't active:", lionEvent.active)
+            return;
+        }
         const { type,name, args, eventID: id } = message;
         if (id == eventID) {
             lionEvent.triggerLocal(name, args);
@@ -37,7 +42,8 @@ port2.start();
 class LionEvent {
     constructor() {
         this.lionEvents = new EventEmitter();
-        
+        this.name = eventID;
+        this.active = true;
         // const channel = new MessageChannel()
         // const port1 = channel.port1
         // this.port2 = channel.port2
@@ -57,6 +63,14 @@ class LionEvent {
 
         // });
 
+    }
+
+    setName(name) {
+        this.name = name;
+    }
+
+    setActive(value = true) {
+        this.active = value;
     }
 
     getLionEvents() {
@@ -90,6 +104,10 @@ class LionEvent {
 
 
     trigger(name, args) {
+        if (!this.active) {
+            console.log("🚀 ~ file: lionEvent.js:103 ~ LionEvent ~ trigger ~ can't active:", this.active)
+            return;
+        }
         console.log(`trigger remote event ${eventID}:`, name, args, this.lionEvents);
 
         ipcRenderer.send('triggerEvent', { name: name, eventID: eventID, args: args });
@@ -103,6 +121,12 @@ class LionEvent {
     }
 
     triggerLocal(name, data) {
+        if(!this.active){
+            console.log("🚀 ~ file: lionEvent.js:124 ~ LionEvent ~ triggerLocal  ~ can't active:", this.active)
+            return
+
+        }
+
         console.log('triggering local event', name, data);
         this.lionEvents.emit(name, data);
     }
@@ -125,7 +149,8 @@ class LionEvent {
 // );
 
 
-const lionEvent = new LionEvent();
+export const lionEvent = new LionEvent();
+console.log("🚀 ~ file: lionEvent.js:138 ~ lionEvent:", lionEvent)
 
 
 lionEvent.register('extension.port.close', (data) => {

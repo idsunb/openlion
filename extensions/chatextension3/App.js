@@ -1,21 +1,24 @@
 // import { registerCommand } from '../../src/workspace/command/commands';
 import { set } from 'lodash';
-import openlion,{lionExtension} from '../../src/workspace/lionAPI/openlion';
+import {openlion} from '../../src/workspace/lionAPI/openlion';
 // import openlion from 'openlion'
-
-
+export {openlion} from '../../src/workspace/lionAPI/openlion';
 // import { IpcRenderer } from 'electron';
 
-
+export const commandTest =  openlion.lionCommand
 // const newLion = new LionExtension('chatextension3');
 
 // class chat3 extends LionExtension {
 //     mouth() {
 //         console.log('mouth test ',this.name);
 //     }
-lionExtension.active = () => {
-    console.log('active from extension~~~66');
-}
+// extension.active = () => {
+//     console.log('active from extension~~~66');
+// }
+
+
+
+
 
 
 // }
@@ -25,7 +28,7 @@ lionExtension.active = () => {
 
 
 
-export const b =3 
+const b =3 
 // newLion.mouth()
 // newLion.activate()
 // newLion.deactivate()
@@ -36,26 +39,32 @@ export const b =3
 console.log('chatextension3');
 
 
-export const test = () => {
-    console.log('test from extension');
+const test = (data) => {
+    console.log("🚀 ~ file: App.js:41 ~ test ~ test from extension:", data)
+    return "gooooooooooooooo"
 }
 
 
 
 openlion.lionCommand.register({name:'test1',action:test});
 
-console.log('lioncontext--------------',openlion.lionContext.getState());
 setTimeout(() => {
-    console.log('lioncontext',openlion.lionContext.getState());
+    console.log("🚀 ~ file: App.js:50 ~ setTimeout ~ openlion.lionContext.getState():", openlion.lionContext.getState())
+    console.log("🚀 ~ file: App.js:51 ~ setTimeout ~ openlion.lionContext.getTestState():", openlion.lionContext.getTestState())
+
 
 }, 1000);
-console.log('lioncontext getTestState',openlion.lionContext.getTestState());
+
+
+
+
 
 
 
 const test3 = (name,age) => {
     console.log('test3 from extension');
 }
+
 
 
 // module.exports = {

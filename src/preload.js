@@ -1,8 +1,6 @@
 
-import { contextBridge, ipcRenderer, app } from 'electron';
-import React, { useContext } from 'react';
-import { ReactDOM } from 'react';
 import path from 'path';
+
 // import MyContext from './MyContext';
 // import {useMyContextState} from './MyContext';
 // import { triggerEvent } from './lionevent/LionEvent';
@@ -16,7 +14,6 @@ import path from 'path';
 // console.log('-----');
 
 // window.lionAPIP = openlion;
-
 
 
 // openlion.lionCommand.register({name:'test',action:() => {console.log('test from preload')}});

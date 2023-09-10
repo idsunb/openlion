@@ -6,13 +6,15 @@
   
   .tablist {
     display: flex;
-    flex-wrap: nowrap;
+    /* flex-wrap: nowrap; */
     overflow-x: auto;
     overflow-y: hidden;
     margin: 0;
     padding: 0;
     list-style: none;
     border-bottom: 1px solid #ccc;
+    flex-wrap: wrap;
+
   }
   
   .tab {
@@ -24,7 +26,9 @@
     user-select: none;
     border: 1px solid transparent;
     border-bottom: none;
-    
+    flex-basis: auto;
+
+
   }
   
   .active {

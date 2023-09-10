@@ -1,4 +1,5 @@
-import { ipcRenderer } from 'electron';
+// import { ipcRenderer } from 'electron';
+const {ipcRenderer} = require('electron');
 const _ = require('lodash');
 import lionEvent from '../event/lionEvent';
 
@@ -42,64 +43,69 @@ port2.start();
 
 
 
-
-export const lionContext = 
-{
-    states:{},
-
-
-
-        init: async () => {
-            await lionContext.update();
-        },
-
-        setState: async (newState) => {
-            await lionContext.waitForInit();
-
-            port2.postMessage({ type: 'setState', contextID: contextID, newState: newState });
-        },
-
-        mergeState: async (newState) => {
-            lionEvent.trigger('mergeState', newState);
+class LionContext {
+    constructor() {
+        this.states = {};
+        this.states[contextID] = {};
+        this.setConfig({contextID:contextID})
 
 
-            await lionContext.waitForInit();
-            port2.postMessage({ type: 'mergeState', contextID: contextID, newState: newState });
-        },
+    }
 
-        getState: () => {
-            const valuesArray = Object.values(lionContext.states); // 获取原对象的值并转为数组
-            const mergedObject = valuesArray.reduce((result, value, index) => {
-                result = _.merge({},result,value); // 创建新对象，将值合并到新对象中
-                return result;
-              }, {});
-            return mergedObject
-        },
+    static  init =async () => {
+        const result = await ipcRenderer.invoke('context.getState', { contextID: contextID });
 
-        getTestState: () => {
-            return lionContext.states;
-        },
-
-        waitForInit: async () => {
-            // console.log('waitForInit',lionContext.initPromise);
-            if (!lionContext.initPromise) {
-                lionContext.initPromise = lionContext.init();
-                await lionContext.initPromise;
-
-            }
-        },
-
-        update: async () => {
-            // const result = await sendMessage({ type: 'getState', contextID: contextID });
-            const result = await ipcRenderer.invoke('context.getState', { contextID: contextID });
+        return result; 
+    }
 
 
-            lionContext.states = Object.assign({}, result);
-        },
-    
+
+    async setConfig(config) 
+    {
+        // this.states[contextID].config = config;
+        // _.merge(this.states[contextID],config);
+        await this.mergeState({config:config})
+    }
+
+    getConfig() {
+        return this.states[contextID].config;
+    }
+
+    async setState(newState) {
+        port2.postMessage({ type: 'setState', contextID: contextID, newState: newState });
+
+    }
+
+    async mergeState(newState) {
+        // port2.postMessage({ type: 'mergeState', contextID: contextID, newState: newState });
+        const result = await ipcRenderer.invoke('context.mergeState', { contextID: contextID, newState: newState });
+        this.states = Object.assign({}, result);
+    }
+
+    getState() {
+        const valuesArray = Object.values(this.states);
+        const mergedObject = valuesArray.reduce((result, value, index) => {
+            result = _.merge({},result,value);
+            return result;
+        }, {});
+        return mergedObject
+    }
+
+    getTestState() {
+        return this.states;
+    }
 
 
+
+    async update() {
+        const result = await ipcRenderer.invoke('context.getState', { contextID: contextID });
+        this.states = Object.assign({}, result);
+    }
 }
+
+const initState = LionContext.init();
+
+export const lionContext = new LionContext(initState);
 
 
 

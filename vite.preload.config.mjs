@@ -4,14 +4,4 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 
 
-
-    build: {
-        format: 'esm',
-
-        rollupOptions: {
-          output: {
-            format: 'es', // 输出为 ESM 格式
-          },
-        },
-      },
 });

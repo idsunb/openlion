@@ -3,12 +3,12 @@ import { MyTabs, Tab, TabList, TabPanel } from '../../tabs/MyTabs';
 import TabPanelTest1 from '../../TabPanelTest1';
 import TabPanelTest2 from '../../TabPanelTest2';
 import styles from './MainPanel.module.css';
-import path from 'path';
+// import path from 'path';
+const path = require('path');
 // const { registerEvent } = window.lionAPI;
 // const { registerCommand } = window.lionAPI;
 import openlion from '../../workspace/lionAPI/openlion';
 import KeybindingManager from '../keybindEdit/KeybindingManager';
-import { ipcRenderer } from 'electron';
 
 // ipcRenderer.on('message', (event, message) => {
 //   console.log(message); // 输出：hello, world
@@ -19,9 +19,12 @@ const mainpanelInitialState = {
   devToolsOpen: false,
   inputVal: '',
   outputVal: '',
-  tabPanels: [{ id: 0, type: 'normaltext', pros: { title: 'Tab 1', content: 'This is the content of Tab 1.' } },
-  { id: 1, type: 'reactcomponent', pros: { title: "TabPanelTest1", componentname: "TabPanelTest1", }, },],
+  tabPanels: [
+    
+    { id: 0, type: 'normaltext', pros: { title: 'Tab 1', content: 'This is the content of Tab 1.' } },
+  { id: 1, type: 'component', pros: { title: "TabPanelTest1", tip:"", componentname: "TabPanelTest1", }, },],
 };
+
 
 
 function mainpanelReducer(state, action) {
@@ -68,9 +71,29 @@ function mainpanelReducer(state, action) {
       };
       return {
         ...state,
-        tabPanels: [...state.tabPanels, newWebviewTabPanel],
         activeTab: newWebviewTabPanel.id,
+        tabPanels: [...state.tabPanels, newWebviewTabPanel],
       };
+    case 'CLOSE_TAB':
+      //用filter 创建一个新的数组，不要直接修改原数组
+      const newTabPanels = state.tabPanels.filter((tabPanel,index) => index !== action.payload);
+      // state.tabPanels.splice(action.payload, 1)
+      return {
+        ...state,
+        tabPanels: newTabPanels,
+      }
+    case 'CLOSE_TAB_BY_TITLE':
+      //用filter 创建一个新的数组，不要直接修改原数组
+      const newTabPanels1 = state.tabPanels.filter((tabPanel,index) => tabPanel.pros.title !== action.payload);
+
+      return {
+        ...state,
+        tabPanels: newTabPanels1,
+      }
+
+
+    case 'GETSTATE':
+      return state;
 
 
     case 'CLEAR_TAB_BAR_STATE':
@@ -85,6 +108,8 @@ function mainpanelReducer(state, action) {
 
 const MainPanel = () => {
   const savedState = localStorage.getItem('tabBarState');
+
+
 
   const [state, dispatch] = useReducer(mainpanelReducer, savedState ? JSON.parse(savedState) : mainpanelInitialState);
   // const [mainpanelState, mainpanelDispatch] = useReducer(mainpanelReducer, savedState ? JSON.parse(savedState) : mainpanelInitialState);
@@ -131,90 +156,55 @@ const MainPanel = () => {
     dispatch({
       type: 'OPEN_NEW_REACT_TABPANEL',
       payload: {
-        type: 'reactcomponent',
+        type: 'component',
         pros: { title, componentname }
       },
     });
   };
 
-  //打开一个webview
-  const handleOpenWebview = () => {
-    console.log('handleOpenWebview');
+
+
+  const handleOpenWebview = ({url, title,tip}) => {
+  console.log("🚀 ~ file: MainPanel.jsx:143 ~ handleOpenWebview ~ url:", url)
+
+    // const test = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html'
     const preloadpath = 'D:\\文档\\codes\\openlion\\esbuild\\extensionpreload.js';
-    // const preloadpath = 'D:\\文档\\codes\\openlion\\.vite\\build\\extensionpreload.js';
 
-    console.log('preloadpath', preloadpath);
-
-    // const testpath = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html';
-    //直接使用本地文件路径
-    // const anotherpath = 'D:\\文档\\codes\\openlion\\src\\extensionpreload.js';
-    // const preload = `file://${__dirname}/preload.js`;
-    // console.log(preload);
-
-    const url = 'http://localhost:5181';
-    console.log('url', url);
+    // file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html
     dispatch({
       type: 'OPEN_NEW_WEBVIEW_TABPANEL',
       payload: {
         type: 'webview',
         pros: {
-          title: 'Tab 2',
-          id: "chatextension",
+          title: title,
+          id: "MainPanel-" + title,
           nodeintegration: "true",
 
           // src:"http://localhost:3000/chat_extension",
           src: url,
           // src: testpath,
           style: { width: '400px', height: '300px' },
-          webpreferences: {
-            devTools: true,
-            nodeIntegration: true,
-            // nodeIntegrationInWorker: true,
-            // nodeIntegrationInSubFrames: true,
-            // webviewTag: true,
-            // enableRemoteModule: true,
-            // contextIsolation: false,
-
-
-          },
-          // preload:preloadpath,
           preload: `file://${preloadpath}`,
-          // preload:anotherpath,
-          // preload: path.join(__dirname, 'preload.js'),
 
-          // preload:{'file://${__dirname}/preload.js'},
+          webpreferences: 'nodeIntegration=true, contextIsolation=false'
         },
       },
     });
   };
 
+
+
+
   const handleclear = async () => {
     console.log('clear state');
     localStorage.removeItem('tabBarState');
-    // const webviews = document.getElementsByTagName('webview');
+    const webviews = document.getElementsByTagName('webview');
     // console.log('webview.length', webviews.length);
-    // for (let i = 0; i < webviews.length; i++) {
+    for (let i = 0; i < webviews.length; i++) {
     //   const webid = webviews[i].getWebContentsId();
-    //   webviews[i].closeDevTools();
+      webviews[i].closeDevTools();
     //   webviews[i].getWebContents()
-
-    // //   await new Promise((resolve) => {
-    // //     console.log('webid', webid);
-               
-
-    // //     resolve();
-
-    // //   }).then(() => {          console.log('webview removed...')
-    // // })
-    // // setTimeout(() => {
-    // //   webviews[i].remove(); 
-    // // }, 1000);
-
-    //   // webviews[i].send('beforeunload',webid);
-    //   // 关闭webview 
-
-
-    // }
+    }
     dispatch({ type: 'CLEAR_TAB_BAR_STATE' });
   };
 
@@ -250,20 +240,12 @@ const MainPanel = () => {
     });
   };
 
-  // useEffect(() => {
-  //   const webviews = document.getElementsByTagName('webview');
-  //   for (let i = 0; i < webviews.length; i++) {
-  //     webviews[i].addEventListener('DOMNodeRemoved', () => {
-  //       console.log('webview removed');
-  //       const webContentsId = webviews[i].getWebContentsId();
-  //       ipcRenderer.send('remove-state-by-id', webContentsId);
-  //     });
-  //   }
 
-
-  // }, [state.tabPanels]);
 
   useEffect(() => {
+
+
+
     window.addEventListener('message', (event) => {
       switch (event.data.type) {
         case 'mainpanel-add-tab-panel':
@@ -276,10 +258,6 @@ const MainPanel = () => {
             title: 'Tab 2',
             componentname: 'TabPanelTest1',
           })();
-          break;
-        case 'mainpanel-open-webview':
-          console.log('open-webview');
-          handleOpenWebview();
           break;
         case 'mainpanel-clear':
           console.log('clear');
@@ -299,17 +277,16 @@ const MainPanel = () => {
 
     // registerEvent('open-main-panel-tab', handleOpenNewTabPanelTest);
     openlion.lionEvent.register('open-main-panel-tab', handleOpenNewTabPanelTest);
+    openlion.lionCommand.register({name:'mainpanel.openwebview',action:handleOpenWebview});
+    openlion.lionCommand.register({name:'mainpanel.deletewebview',action:handleDeleteTabByTitle});
+
 
     openlion.lionCommand.register({
       name: 'mainpanel.keybinding.panel.open', action:
         //测试用，以后可删
 
-
-
-
         () => { handleOpenNewRactTabPanel({ title: '快捷键管理', componentname: 'KeybindingManager', })() }
     });
-    console.log('lionAPI', openlion.lionCommand.getCommands())
 
     return () => {
       window.removeEventListener('message');
@@ -342,35 +319,35 @@ const MainPanel = () => {
 
   const tabPanellistRender = useMemo(() => {
 
-    return state.tabPanels.map(({ id, type, pros }) => {
+    return state.tabPanels.map(({ id, type, pros },index) => {
       if (type === 'normaltext') {
-        return (<TabPanel key={id} >{pros.content}</TabPanel>);
+        return (<TabPanel key={index} >{pros.content}</TabPanel>);
       }
-      else if (type === 'reactcomponent') {
+      else if (type === 'component') {
         switch (pros.componentname) {
           case 'TabPanelTest1':
-            return (<TabPanel key={id} ><TabPanelTest1 /></TabPanel>);
+            return (<TabPanel key={index} ><TabPanelTest1 /></TabPanel>);
           case 'TabPanelTest2':
-            return (<TabPanel key={id} ><TabPanelTest2 /></TabPanel>);
+            return (<TabPanel key={index} ><TabPanelTest2 /></TabPanel>);
           case 'KeybindingManager':
-            return (<TabPanel key={id} ><KeybindingManager /></TabPanel>);
+            return (<TabPanel key={index} ><KeybindingManager /></TabPanel>);
           default:
             return null;
         }
       }
       else if (type === 'webview') {
         return (
-          <TabPanel key={id}>
-            <webview name={`webview-${id}`} {...pros} ></webview>
+          <TabPanel key={index}>
+            <webview name={`MainPanel-${index}`} {...pros} ></webview>
 
-            <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].openDevTools(); }}>打开webview 开发者工具</button>
-            <button onClick={() => { document.getElementsByName(`webview-${id}`)[0].closeDevTools(); }}>关闭webview 开发者工具</button>
+            <button onClick={() => { document.getElementsByName(`MainPanel-${index}`)[0].openDevTools(); }}>打开webview 开发者工具</button>
+            <button onClick={() => { document.getElementsByName(`MainPanel-${index}`)[0].closeDevTools(); }}>关闭webview 开发者工具</button>
 
           </TabPanel>
         );
       }
       else {
-        return <TabPanel key={id}>wrong type</TabPanel>;
+        return <TabPanel key={index}>wrong type</TabPanel>;
       }
     });
 
@@ -378,9 +355,31 @@ const MainPanel = () => {
 
 
   const handleSetActiveTab = (index) => {
+    
     dispatch({ type: 'SET_ACTIVE_TAB', payload: index });
   };
 
+  const handleDeleteTabByTitle = ({title}) => {
+    console.log("🚀 ~ file: MainPanel.jsx:364 ~ handleDeleteTabByTitle ~ handleDeleteTab:")
+    console.log(title);
+    
+    //为何此处捕获了闭包，不要闭包
+    dispatch({ type: 'CLOSE_TAB_BY_TITLE', payload: title });
+    
+  
+
+
+  };
+
+  const handleDeleteTab = (index) => {
+    //如果webview，并且webview的开发者工具打开了，先关闭开发者工具
+    if(state.tabPanels[index].type === 'webview' ){
+    document.getElementsByName(`MainPanel-${index}`)[0].closeDevTools()
+    }
+    dispatch({ type: 'CLOSE_TAB', payload: index });
+  };
+
+  
 
 
   return (
@@ -388,23 +387,16 @@ const MainPanel = () => {
 
       <MyTabs activeIndex={state.activeTab} onTabClick={handleSetActiveTab}>
         <TabList >
-          {state.tabPanels.map((tabPanel) => (<Tab key={tabPanel.id}>{tabPanel.pros.title}{console.log('我被渲染了')}</Tab>))}
+          {state.tabPanels.map((tabPanel,index) => (<Tab key={index}>{tabPanel.pros.title}{console.log('我被渲染了')}
+          <button onClick={() => handleDeleteTab(index)}>X</button>
+
+
+          </Tab>))}
         </TabList>
         {tabPanellistRender}
 
       </MyTabs>
-      {/*       
-    <button onClick={handleOpenNewRactTabPanel({
-            title: 'Tab 2',
-            componentname: 'TabPanelTest1',
-          })}>Add New 组件</button>
-      <br/>
-      <button onClick={handleOpenWebview}>Open Webview</button>
-      <br/>
-      <button onClick={  handleclear }>Clear State</button> */}
-      {/* <button onClick={handleAddTab}>Add Tab</button> */}
-      {/* <button onClick={handleAddTab1}>Add Tab</button> */}
-      {/* <button onClick={handleOpenDevTools}>Open DevTools</button> */}
+
 
     </div>
   );
@@ -412,27 +404,6 @@ const MainPanel = () => {
 
 
 };
-// const TabBar = () => {
-//   return (
-//     <div>
-//       <h1>TabBar</h1>
-//     </div>
-//   );
-// };
 
-//map方法来渲染tabPanel
-// const componentMap = {
-//   TabPanelTest2: TabPanelTest2,
-//   // add more components here
-// };
-
-// {state.tabPanels.map(({ id, type, pros }) => {
-//   const Component = componentMap[type];
-//   if (Component) {
-//     return (<TabPanel key={id} forceRender={false}><Component {...pros} /></TabPanel>);
-//   } else {
-//     return null;
-//   }
-// })}
 
 export default MainPanel;

@@ -2,9 +2,10 @@
   "activate": "",
   "deactivate": "",
   "main": "App.js",
-  "title": "My Extension 3",
+  "title": "我的第三个插件",
   "version": "1.0.0",
   "publisher": "My Publisher",
+  "description":"用来测试模块js类型的插件",
   "name": "my-extension-test3",
   "mode": "js",
   "codes": {

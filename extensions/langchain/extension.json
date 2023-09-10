@@ -1,0 +1,12 @@
+{
+    "activate": "",
+    "deactivate": "",
+    "main": "extension.js",
+    "title": "langchain插件",
+    "version": "1.0.0",
+    "description":"langchain的各种功能",
+    "publisher": "My Publisher",
+    "name": "langchain",
+    "preload":""
+
+  }

@@ -5,17 +5,22 @@ import ReactDOM from 'react-dom';
 
 
 const setTitle = () => {
-    openlion.setTitle('hello');
+    openlion.setTitle('hello1');
 }
 
 const setCommand = () => {
 
 
 
+
+    
+
 openlion.lionCommand.register({name:'extension1.hellofromchat', action:() => {
         console.log('hello from cat');
 }});
 }
+
+
 
 const callrendercommandtest = () => {
     openlion.lionCommand.call('extension1.hellofromchat');

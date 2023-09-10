@@ -9,12 +9,5 @@ export default defineConfig({
 
     },
 
-    build: {
-        rollupOptions: {
-          output: {
-            format: 'es', // 输出为 ESM 格式
-          },
-        },
-      },
 
 });

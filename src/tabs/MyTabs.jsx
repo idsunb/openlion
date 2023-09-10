@@ -8,10 +8,22 @@ function MyTabs({ children, activeIndex = 0, onTabClick, onTabMove, className, .
 
 
 
+  useEffect(() => {
+    
+    setActiveIndexState(activeIndex);
+    console.log("🚀 ~ file: MyTabs.jsx:14 ~ useEffect ~ activeIndex:", activeIndex)
+  }, [activeIndex]);
 
 
   const handleTabClick = (index) => {
-    onTabClick && onTabClick(index) || setActiveIndexState(index);
+    if(onTabClick){
+      onTabClick(index);
+      
+    }else{
+      setActiveIndexState(index);
+    }
+
+
   };
 
   const handleTabMouseDown = (event, index) => {
@@ -69,6 +81,7 @@ function MyTabs({ children, activeIndex = 0, onTabClick, onTabMove, className, .
       return null;
     });
   }, [children, activeIndexState]);
+
 
 
 

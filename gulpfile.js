@@ -17,22 +17,23 @@ let electronProcess;
 
 
 gulp.task('esbuildRenderer', function () {
-  return gulp.src('./src/index.jsx')
+  return gulp.src('src/index.jsx')
     .pipe(esbuild({
       entryPoints: ['./src/index.jsx'],
       bundle: true,
       platform: 'node',
       format: 'esm',
-      target: ['es2022', 'node18'],
-      outfile: './index.mjs',
+      target: ['chrome98'],
       loader: { '.js': 'jsx', '.css':'local-css' },
       external: ['electron'],
+      sourcemap: true,
+
     }))
     .pipe(gulp.dest('./esbuild'));
 });
 
 gulp.task('esbuildMain', function () {
-  return gulp.src(['./src/main.js'])
+  return gulp.src(['src/main.js'])
     .pipe(esbuild({
       bundle: true,
       format: 'cjs',
@@ -42,12 +43,13 @@ gulp.task('esbuildMain', function () {
       platform: 'node',
       target: 'chrome89',
       external: ['electron'],
+      sourcemap: true,
     }))
     .pipe(gulp.dest('./esbuild'));
 });
 
 gulp.task('esbuildPreload', function () {
-  return gulp.src(['./src/preload.js'])
+  return gulp.src(['src/preload.js'])
     .pipe(esbuild({
       bundle: true,
       format: 'cjs',
@@ -56,10 +58,26 @@ gulp.task('esbuildPreload', function () {
       minify: true,
       platform: 'node',
       target: 'chrome89',
+      sourcemap: true,
+
       external: ['electron'],
     }))
     .pipe(gulp.dest('./esbuild'));
 });
+
+
+gulp.task('watchrenderer', function () {
+  gulp.watch(['src/**/*.js','src/**/*.jsx','src/**/*.mjs','src/**/*.css','src/**/*.module.css'], gulp.series('esbuildRenderer'));
+});
+gulp.task('watchpreload', function () {
+  gulp.watch(['src/preload.js'], gulp.series('esbuildPreload'));
+});
+
+  // gulp.watch(['src/main.js','src/base/**/*.js'], gulp.series('esbuildMain','runE'));
+gulp.task('watchmain', function () {
+  gulp.watch(['src/main.js','src/main.mjs','src/base/**/*.js'], gulp.series('esbuildMain' ));
+});
+gulp.task('watchmain',gulp.parallel('watchmain','watchpreload','watchrenderer'));
 
 
 gulp.task('esbuildExtensionPreload', function () {
@@ -87,11 +105,11 @@ gulp.task('esbuildExtensionPreload', function () {
 gulp.task('buildex3', function () {
   return gulp.src('extensions/chatextension3/App.js')
     .pipe(esbuild({
-      target: ['es2022','node18','chrome89'],
-      platform: 'node',
-      format: 'cjs',
+      target: ['chrome98'],
       bundle: true,
       minify: true,
+      platform: 'node',
+      format: 'esm',
       loader:{ '.js': 'jsx' },
       external:['electron'],
 
@@ -102,6 +120,62 @@ gulp.task('buildex3', function () {
 // gulp.task('watch', function () {
 //   gulp.watch('extensions/chatextension3/*.js', gulp.series('build'));
 // });
+
+
+
+gulp.task('buildex1', function () {
+  return gulp.src(['extensions/chatextension/index.jsx','extensions/chatextension/extension.js'])
+    .pipe(esbuild({
+      target: ['es2022', 'node18'],
+      bundle: true,
+      minify: true,
+      platform: 'node',
+      format: 'esm',
+      loader:{ '.js': 'jsx','.css':'local-css' },
+      external:['electron'],
+      sourcemap: true,
+
+    }))
+    .pipe(gulp.dest('c:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension\\'))
+
+});
+
+
+
+
+gulp.task('buildex4', function () {
+  return gulp.src(['extensions/langchain/extension.js','extensions/langchain/index.js','extensions/langchain/chat/chat.js'])
+    .pipe(esbuild({
+      target: ['es2022', 'node18'],
+      bundle: true,
+      minify: true,
+      platform: 'node',
+      format: 'esm',
+      loader:{ '.js': 'jsx','.css':'local-css' },
+      external:['electron'],
+      sourcemap: true,
+
+    }))
+    .pipe(gulp.dest('c:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\langchain\\'))
+
+});
+
+
+gulp.task('watchex4', function () {
+  gulp.watch(['extensions/langchain/**/*.js','src/**/*.js'], gulp.series('buildex4'));
+});
+gulp.task('watchex3', function () {
+  gulp.watch(['extensions/chatextension3/**/*.js','src/**/*.js'], gulp.series('buildex3'));
+});
+gulp.task('watchex1', function () {
+  gulp.watch(['extensions/chatextension/**/*.jsx','extensions/chatextension/**/*.js','src/**/*.js'], gulp.series('buildex1'));
+});
+gulp.task('watchExtensionPreload', function () {
+  gulp.watch(['src/extensionpreload.js'], gulp.series('esbuildExtensionPreload'));
+});
+gulp.task('watch', gulp.parallel('watchex3','watchex4','watchex1', 'watchExtensionPreload'));
+
+
 
 
 gulp.task('openlion', function () {
@@ -119,13 +193,6 @@ gulp.task('openlion', function () {
 
 });
 
-gulp.task('watchex3', function () {
-  gulp.watch(['extensions/chatextension3/**/*.js','src/**/*.js'], gulp.series('buildex3'));
-});
-
-gulp.task('watchExtensionPreload', function () {
-  gulp.watch(['src/extensionpreload.js'], gulp.series('esbuildExtensionPreload'));
-});
 // gulp.task('runE', shell.task([
 //   'electron esbuild/main.js'
 // ]));
@@ -157,19 +224,10 @@ function killProcess(pid, callback) {
   });
 }
 
-gulp.task('watchrenderer', function () {
-  gulp.watch(['src/**/*.js','src/**/*.jsx','src/**/*.mjs','src/**/*.css','src/**/*.module.css'], gulp.series('esbuildRenderer'));
-});
-
-  // gulp.watch(['src/main.js','src/base/**/*.js'], gulp.series('esbuildMain','runE'));
-
-gulp.task('watchmain', function () {
-  gulp.watch(['src/main.js','src/main.mjs','src/base/**/*.js'], gulp.series('esbuildMain' ));
-});
 
 
 gulp.task('copy', function () {
-  return gulp.src('extensions/**/*')
+  return gulp.src(['extensions/**/*','!extensions/**/index.html'])
     .pipe(gulp.dest('C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\'));
     
 });
@@ -181,7 +239,8 @@ gulp.task('hello', function(cb) {
     cb();
 });
 
-gulp.task('watch', gulp.parallel('watchex3', 'watchExtensionPreload'));
+
+
 
 
 gulp.task('test', function () {

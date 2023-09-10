@@ -96,17 +96,19 @@ const createWindows = async () => {
   // if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
 
   //for vite
-    mainWindow.loadURL("http://localhost:5180/");
+    // mainWindow.loadURL("http://localhost:5180/");
   // } else {
   //   mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   // }
 
-
   //for esbuild 
   // console.log('___dirname----------------------------',__dirname);
   // mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join('./index.html'));
 
   
+
+
 
 
 //设置菜单

@@ -1,15 +1,15 @@
 //左边侧边栏，包含一个竖向的tab，每个tab对应一个页面，tab的切换通过点击tab来实现，tab的宽度很窄
 
-import React, { useContext,lazy,Suspense, useState } from 'react';
+import React, { useContext, lazy, Suspense, useState, useReducer, useMemo, useEffect } from 'react';
 //css文件先后顺序，会影响同属性名的覆盖优先级
 import styles from './LeftSidePanel.module.css';
 import { MyTabs, Tab, TabList, TabPanel } from '../../tabs/MyTabs';
 
-import ExtensionManager from '../extension/ExtensionManager';
-import ExtensionManager1 from '../extension/ExtensionManager1';
+import ExtensionPanel from '../extension/ExtensionPanel';
 import SettingManagerUI from '../../setting/SettingManagerUI';
 import openlion from '../../workspace/lionAPI/openlion';
 import { set } from 'lodash';
+import TestView from '../../services/testpanel/TestView';
 
 
 // const {triggerEvent} = window.lionAPI;
@@ -19,189 +19,151 @@ import { set } from 'lodash';
 // import './LeftSidePanel.css';
 // import {} from './MyContext';
 
-const LazyExtensionManager1 = lazy(() => import('../extension/ExtensionManager1'));
+
+const leftpanelInitialStates = {
+  activeTab: 0,
+  tabs: [
+  //   { id: 0, type: "component", pros: { title: '测试工具', tip: 'testtip', componentName: 'Testview', component: <TestView /> } },
+  // { id: 1, type: "component", pros: { title: '扩展中心', tip: 'testtip', componentName: 'ExtensionPanel', component: <ExtensionPanel /> } },
+  // { id: 3, type: "component", pros: { title: '设置', tip: 'testtip', componentName: 'SettingManagerUI', component: <SettingManagerUI /> } },
+  ],
+}
+
+const leftpanelReducer = (state, action) => {
+  switch (action.type) {
+    case 'OPEN_NEW_COMPONENT_TAB':
+      return {
+        ...state,
+        tabs: [...state.tabs, { id: state.tabs.length, type: "component", pros: { title: action.payload.title, tip: action.payload.tip, componentName: action.payload.componentName, component: action.payload.component } }],
+      }
+    case 'OPEN_NEW_WEBVIEW_TAB':
+      return {
+        ...state,
+        tabs: [...state.tabs, { id: state.tabs.length, type: "webview", pros: action.payload.pros }],
+      }
+
+    case 'SET_ACTIVE_TAB':
+      return {
+        ...state,
+        activeTab: action.payload.activeTab,
+      }
+    case 'DELETE_WEBVIEW_TAB':
+      return {
+        ...state,
+        tabs: state.tabs.filter((tab) => tab.pros.title !== action.payload.title),
+      }
+
+
+    default:
+      return state;
+
+  }
+}
+
+
+
+
+const LazyExtensionManager1 = lazy(() => import('../extension/ExtensionPanel'));
+
+
+
+
 
 
 
 const LeftSidePanel = () => {
-  const [objItem, setObjItem] = useState("event");
+  const [leftpanelState, dispatch] = useReducer(leftpanelReducer, leftpanelInitialStates);
 
-  
-  
-  // const data = useContext(MyContext);
-    // console.log(data);
-    console.log('LeftSidePanel');
-    // const handleAddTab = () => {
-    //     // window.handleAddTab2();
-    //     // window.postMessage({ type: 'add-tab-panel' }, '*');
-    //     window.lionAPI.useContexttest1();
-    //     // onAddTab('New Tab');
-    //     // setTabIndex(tabIndex + 1);
-    //   };
+  const handleOpenNewComponentTab = ({componentName, title, tip,component}) => {
+    dispatch({ type: 'OPEN_NEW_COMPONENT_TAB', payload: { componentName, title, tip,component } });
+  }
 
-      const handleAddTab = () => {
-         const path = openlion.getfilepath()
-         console.log(path);
-        // onAddTab('New Tab');
-        // setTabIndex(tabIndex + 1);
-      };
-      const handleAddTab1 = () => {
-        window.lionAPI.useContexttest1();
-        // onAddTab('New Tab');
-        // setTabIndex(tabIndex + 1);
-      };
-      const handleOpenNewTabPanel = () => {
-        window.postMessage({ type: 'mainpanel-add-tab-panel' }, '*');
-      }
-      const handleOpenNewRactTabPanel = () => {
-        window.postMessage({ type: 'mainpanel-add-react-tab-panel' }, '*');
-      }
-      const handleOpenWebview = () => {
-        window.postMessage({ type: 'mainpanel-open-webview' }, '*');
-      }
-      const handleclear = () => {
-        window.postMessage({ type: 'mainpanel-clear' }, '*');
-      }
-      const handlePath = () => {
-        // const path = lionAPI.getPreloadFilePath()
-        // console.log(path);
-      }
-      const handleTest = () => {
-        console.log(openlion.myvalue())
+  const handleOpenNewWebviewTab = ({ url, title, tip }) => {
 
+    console.log('handleOpenNewWebviewTab herellllll',url);
+    const preloadpath = 'D:\\文档\\codes\\openlion\\esbuild\\extensionpreload.js';
+
+    dispatch({ type: 'OPEN_NEW_WEBVIEW_TAB', payload: {
+      pros:{
+            title: title,
+            id: 'LeftSidePanel-'+title,
+            tip: tip,
+            nodeintegration: "true",
+            src: url,
+            style: { width: '100%', height: '100%' },
+            preload: preloadpath,
+            webpreferences: 'nodeIntegration=true, contextIsolation=false'
       }
-      const handleClickEvent = () => {
+    } });
+  }
 
-        openlion.lionCommand.call('system.showNotification',{title:'you are a title',body:'you are a body'});
-
-        // console.log('handleClickEvent');
-        // lionAPI.lionEvent.register('lefttest1', (data) => {
-        //   console.log('system.eventtest1 result');
-        //   console.log(data);
-        // });
-        // lionAPI.lionEvent.trigger('lefttest1', { name: 'lion' });
-
-
-        // window.lionAPI.lionEvent.trigger('somethingHappened', { name: 'lion' })
-        // window.lionAPI.lionEvent.trigger('system.eventtest1', { name: 'lion' });
-      }
-
-      const handleEventregister = () => {
-        console.log('handleEventregister')
-        openlion.lionEvent.register('system.eventtest1', (data) => {
-          console.log('system.eventtest1', data);
-        });
-      }
-      const handleEventtrigger = () => {
-        console.log('handleEventtrigger');
-        openlion.lionEvent.trigger('system.eventtest1','leftpanel');
-      }
-      const handleEventlook = () => {
-        console.log('handleEventlook');
-        console.log(openlion.lionEvent.getLionEvents());
-      }
-
-      const hellomain = () => {
-        console.log('hellomain');
-        console.log(openlion.lionCommand.getCommands());
-        openlion.lionCommand.call('hellofrommain');
-      }
-
-      const handleInfoPanel = () => {
-        console.log('handleInfoPanel');
-        openlion.lionCommand.call('infopanel.addmessage',{a:4});
-      }
-      
-      const handleInputChange = (event) => {
-        setObjItem(event.target.value);
-      };
-
-      const handleSendEvent = async () => {
-        const result = await openlion.lionCommand.call('system.getobject',{name:objItem});
-        openlion.lionCommand.call('infopanel.addmessage',result);
-        
-        console.log('result',JSON.parse(result));
-      };
-      const handleGetState = () => {
-        console.log('handleGetState');
-        console.log(openlion.lionContext.getTestState());
-        openlion.lionCommand.call('infopanel.addmessage',openlion.lionContext.getState());
-      }
-
-
-return (
+  const handleDeleteWebviewTab = ({title}) => {
+    console.log("🚀 ~ file: LeftSidePanel.jsx:101 ~ handleDeleteWebviewTab ~ title:", title)
     
+    dispatch({ type: 'DELETE_WEBVIEW_TAB', payload: { title } });
+  }
+
+
+  useEffect(() => {
+    handleOpenNewComponentTab({componentName:'Testview', title: '测试工具', tip: 'testtip',component:<TestView />});
+    handleOpenNewComponentTab({componentName:'ExtensionPanel', title: '扩展中心', tip: 'testtip',component:<ExtensionPanel />});
+    handleOpenNewComponentTab({componentName:'SettingManagerUI', title: '设置', tip: 'testtip',component:<SettingManagerUI />});
+    // handleOpenNewWebviewTab({ url: 'C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html', title: 'webview', tip: 'testtip' });
+    
+    openlion.lionCommand.register({name:'leftpanel.openwebview', action:handleOpenNewWebviewTab});
+    openlion.lionCommand.register({name:'leftpanel.deletewebview', action:handleDeleteWebviewTab});
+
+
+
+  }, []);
+
+
+
+
+
+  const tabPanelListRender = useMemo(() => {
+    return leftpanelState.tabs.map((tab, index) => {
+          if (tab.type == "component") {
+            return (
+              <TabPanel key={index} className={styles.tabpanel} mykey={tab.id}>
+                {tab.pros.component}
+              </TabPanel>
+            );
+          }
+          if (tab.type == "webview") {
+            return (
+              <TabPanel key={index} className={styles.tabpanel} mykey={tab.id}>
+                <webview name={'LeftPanle'+index} {...tab.pros} ></webview>
+              </TabPanel>
+            );
+          }
+          return null;
+        })}
+  , [leftpanelState]);
+
+
+
+  const handleActiveTab = (index) => {
+    dispatch({ type: 'SET_ACTIVE_TAB', payload: { activeTab: index } });
+  }
+
+
+
+  return (
+
     <div className={styles.leftsidepanel}>
-    <MyTabs className={styles.mytabs}>
+      <MyTabs className={styles.mytabs} activeIndex={leftpanelState.activeTab} onTabClick={handleActiveTab}  >
         <TabList className={styles.tablist}>
-        <Tab className={styles.tab}>测试工具</Tab>
-        <Tab className={styles.tab}>扩展中心</Tab>
-        <Tab className={styles.tab}>扩展中心在设计中</Tab>
-        <Tab className={styles.tab}>快捷键管理</Tab>
-        <Tab className={styles.tab}>设置</Tab>
+          {leftpanelState.tabs.map((tab, index) => {
+            return (
+              <Tab key={index} className={styles.tab}>{tab.pros.title}</Tab>
+            );
+          })}
         </TabList>
-
-        <TabPanel>
-        <h2>内部测试工具</h2>
-        <button onClick={handleAddTab}>Add Tab</button>
-            
-        <button onClick={handleOpenNewTabPanel}>增加普通页面</button>
-        
-
-        
-      <br/>
-      <button onClick={handleOpenNewRactTabPanel}>Add New 组件</button>
-      <br/>
-      <button onClick={handleOpenWebview}>Open Webview</button>
-      <br/>
-      <button onClick={  handleclear }>Clear State</button>
-      <button onClick={handlePath}>路径</button>
-      <button onClick={handleTest}>测试</button>
-      <button onClick={handleEventregister}>注册system.eventtest1事件</button>
-      <button onClick={handleEventtrigger}>触发system.eventtest1事件</button>
-      <button onClick={handleEventlook}>查看事件</button>
-      <button onClick={handleClickEvent}>点击事件</button>
-      <button onClick={hellomain}>测试是否获得main的command</button>
-      <button onClick={handleInfoPanel}>测试信息面板</button>
-      <br/>
-      <div>
-          <select value={objItem} onChange={handleInputChange}>
-            <option value="event">event</option>
-            <option value="command">command</option>
-            <option value="context">context</option>
-          </select>
-          <button onClick={handleSendEvent}>发送</button>
-        </div>
-
-        <br/>
-        <button onClick={handleGetState}>得到state</button>
-
-        </TabPanel>
-        <TabPanel>
-        <h2>扩展中心</h2>
-        <ExtensionManager />
-        </TabPanel>
-        <TabPanel>
-        <h2>扩展中心在设计中</h2>
-        <Suspense fallback={<div>Loading...</div>}>
-
-        <LazyExtensionManager1 />
-        
-        </Suspense>
-        </TabPanel>
-        <TabPanel>
-        <h2>快捷键管理</h2>
-        <button onClick={()=>{openlion.lionCommand.call('mainpanel.keybinding.panel.open')}}>打开快捷键管理</button>
-        </TabPanel>
-        <TabPanel>
-        <h2>设置</h2>
-        <SettingManagerUI />
-        </TabPanel>
-
-
-    </MyTabs>
+        {tabPanelListRender}
+      </MyTabs>
     </div>
-);
+  );
 };
 
 export default LeftSidePanel;

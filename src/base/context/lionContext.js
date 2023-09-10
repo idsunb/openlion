@@ -6,6 +6,7 @@ const _ = require('lodash');
 
 export const lionContext = {
     states: {},
+    name:"system",
     setState: async (newState) => {
         lionContext.states[0] = { ...lionContext.states[0], ...newState };
         for (const [key, value] of portMap.entries()) {
@@ -93,6 +94,12 @@ export const lionContext = {
 ipcMain.handle('context.getState', async (event, data) => {
     return lionContext.states;
 });
+ipcMain.handle('context.mergeState', async (event, data) => {
+    const { contextID, newState } = data;
+    lionContext.states[contextID] = _.merge({}, lionContext.states[contextID], newState);
+    return lionContext.states;
+});
+
 
 
 const portMap = new Map();

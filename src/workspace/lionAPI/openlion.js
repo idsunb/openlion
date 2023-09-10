@@ -1,17 +1,18 @@
 import lionEvent from '../event/lionEvent';
 
 import { lionContext } from '../context/lionContext';
+const path = require('path');
 
 
 
+// import { ipcRenderer } from 'electron';
+const {ipcRenderer} = require('electron');
 
-import { ipcRenderer } from 'electron';
+import command from '../command/commands';
 
-import { registerCommand, getCommands, callCommand } from '../command/commands';
+import { lionExtension } from '../extension/LionExtension';
+import { lionCommand } from 'openlion';
 
-import {lionExtension} from '../extension/extension';
-
-export { lionExtension } from '../extension/extension';
 // console.log(registerCommand, getCommands, callCommand);
 
 
@@ -24,26 +25,33 @@ export { lionExtension } from '../extension/extension';
 
 
 
-const openlion = {
+export const openlion = {
     // triggerEvent: triggerEvent,
     // registerEvent: registerEvent,
     lionCommand: {
-    register: registerCommand,
-    getCommands: getCommands,
-    call: callCommand,
+        setActive: command.setActive.bind(command),
+        setName: command.setName.bind(command),
+        register: command.registerCommand.bind(command),
+        getCommands: command.getCommands.bind(command),
+        call: command.callCommand.bind(command),
     },
 
-    lionContext:{
-        setState:lionContext.setState,
-        mergeState:lionContext.mergeState,
-        getState:lionContext.getState,
-        getTestState:lionContext.getTestState,
+    lionContext: {
+        name: lionContext.name,
+        setState: lionContext.setState.bind(lionContext),
+        setConfig: lionContext.setConfig.bind(lionContext),
+        getConfig: lionContext.getConfig.bind(lionContext),
+        mergeState: lionContext.mergeState.bind(lionContext),
+        getState: lionContext.getState.bind(lionContext),
+        getTestState: lionContext.getTestState.bind(lionContext),
 
     },
 
 
     // lionEvent:lionEvent,
     lionEvent: {
+        setActive: lionEvent.setActive.bind(lionEvent),
+        setName: lionEvent.setName.bind(lionEvent),
         register: lionEvent.register.bind(lionEvent),
         trigger: lionEvent.trigger.bind(lionEvent),
         remove: lionEvent.remove.bind(lionEvent),
@@ -52,14 +60,32 @@ const openlion = {
 
     lionExtension:
     {
-        setName: lionExtension.setName.bind(lionExtension),
-        active: lionExtension.active.bind(lionExtension),
-        deactive: lionExtension.deactive.bind(lionExtension),
-        start: lionExtension.start.bind(lionExtension),
-        die:lionExtension.die.bind(lionExtension)
+        setActive: lionExtension.setActive.bind(lionExtension),
+        setDeactive: lionExtension.setDeactive.bind(lionExtension),
+        enable: lionExtension.enable.bind(lionExtension),
+        disable: lionExtension.disable.bind(lionExtension),
+        name: lionExtension.name,
 
 
     },
+    openWebview: ({url,tip,title,where,aburl}) => {
+        if(where=='mainpanel' && url && !aburl ){
+            // lionContext.getConfig().root
+        lionCommand.call('mainpanel.openwebview', { url: path.join(lionContext.getConfig().root,url), tip: tip, title: title})
+        }
+        if(where=='leftpanel' && url && !aburl ){
+            lionCommand.call('leftpanel.openwebview', { url: path.join(lionContext.getConfig().root,url), tip: tip, title: title})
+        }
+        if(where=='mainpanel' && aburl){
+            lionCommand.call('mainpanel.openwebview', { url: aburl, tip: tip, title: title})
+        }
+        if(where=='leftpanel' && aburl){
+            lionCommand.call('leftpanel.openwebview', { url: aburl, tip: tip, title: title})
+        }
+
+    },
+
+
 
 
     setTitle: (title) => {
@@ -108,6 +134,9 @@ const openlion = {
 };
 
 
+lionExtension.active= function(){
+    console.log('gggggggggggggggggggggggggggggggggggg active');
+}
 
 export default openlion;
 

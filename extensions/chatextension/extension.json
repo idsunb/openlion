@@ -1,12 +1,12 @@
 {
   "activate": "",
   "deactivate": "",
-  "main": "./extension.js",
-  "title": "My Extension",
+  "main": "extension.js",
+  "title": "我的第一个插件",
   "version": "1.0.0",
+  "description":"用来测试webview类型的插件",
   "publisher": "My Publisher",
   "name": "my-extension-test1",
-  "mode": "webview",
   "preload":"",
   "codes": {
       "activeEvents": [

@@ -7,7 +7,7 @@ const commands = {};
 
 commands[0] = {};
 
-
+const active = true
 
 
 // }
@@ -25,7 +25,7 @@ export const registerCommand = ({ name, action, type , source = 'system' ,title}
     return;
   }else{
   commands[0][name] = action;
-  lionContext.mergeState({ commands: { [name]: { type: "system",title:title } } });
+  lionContext.mergeState({ commands: { [name]: { type: "system",title:title,source:'system' } } });
   }
   // if(type === 'system'){
 
@@ -89,7 +89,12 @@ export const callCommand = async (name, args ) => {
           // const result = await commands[value][name](args);
           // console.log('back',back);
           const result = back.result;
-          return result;
+          const error = back.error;
+          if (error) {
+            throw error;
+          } else {
+            return result;
+          }
         }
       }
 

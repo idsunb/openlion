@@ -1,4 +1,5 @@
-import { ipcRenderer } from 'electron';
+// import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron');
 import { lionContext } from '../context/lionContext';
 import lionEvent from '../event/lionEvent';
 
@@ -9,17 +10,26 @@ const channel = new MessageChannel()
 const port1 = channel.port1
 const port2 = channel.port2
 
-ipcRenderer.postMessage('commands', {commandID:commandID}, [port1])
+ipcRenderer.postMessage('commands', { commandID: commandID }, [port1])
 
 
+// let active = true;
+// // let name = contextID;
 
-// console.warn('pre commandID', commandID);
+// // export const setName = (name) => {
+// //   name = name;
+// // }
 
-const commands = {};
+// /**
+//  * set active 
+//  * default is true
+//  * @param value true or false
+//  */
+// export const setActive = (value = true) => {
+//   active = value;
+// }
 
-// const commandstest = {}
-// commandstest[commandID]={}
-commands[commandID]={}
+
 
 // port2.onmessage = (event) => {
 //   console.log('here i receive message', event.data);
@@ -28,218 +38,163 @@ commands[commandID]={}
 
 
 
-port2.addEventListener('message', async (event) => {
-  const message = event.data;
-  // console.log('here i receive message', message);
-  if (message.type === 'callCommand') {
-    // console.log('here i receive callCommand');
-    const { type,name, args, commandID: id } = message;
-    if (id == commandID) {
-      try {
-        // const result = await callCommandLocal(name, args);
-        // port2.postMessage({ type: 'callCommandResult', result });
-        // console.log('main callCommand result id', id, 'result', result);
-        const result = await commands[commandID][name](args);
-        port2.postMessage({ type: 'callCommandResult', result });
-      }
-      catch (error) {
-        console.log('callCommand error', error);
-        port2.postMessage({ type: 'callCommandResult', error });
 
+// port2.addEventListener('message', async (event) => {
+//   const message = event.data;
+//   // console.log('here i receive message', message);
+//   //接收到远端调用的call
+//   if (message.type === 'callCommand') {
+//     // console.log('here i receive callCommand');
+
+//     const { type, name, args, commandID: id } = message;
+//     //如果非激活，则返回一个错误
+//     if (!active) {
+//       // console.log("🚀 ~ file: commands.js:52 ~ port2.addEventListener ~ active:",active )
+//       const myError = new Error(`${commandID} : command ${name}  is not active`);
+//       port2.postMessage({ type: 'callCommandResult', error:new Error('This command is not active')});
+//       // console.log("🚀 ~ file: commands.js:55 ~ port2.addEventListener ~ message:", message)
+//       return;
+      
+//     }
+//     //冗余判断，一般来说发过来都是正确的
+//     if (id == commandID) {
+//       try {
+//         // const result = await callCommandLocal(name, args);
+//         // port2.postMessage({ type: 'callCommandResult', result });
+//         // console.log('main callCommand result id', id, 'result', result);
+//         const result = await commands[commandID][name](args);
+//         port2.postMessage({ type: 'callCommandResult', result });
+//       }
+//       catch (error) {
+//         // console.log("🚀 ~ file: commands.js:65 ~ port2.addEventListener ~ error:", error)
+//         port2.postMessage({ type: 'callCommandResult', error });
+
+//       }
+//     }
+//   }
+// });
+
+// port2.start();
+
+
+
+
+
+
+class Commands {
+  constructor(commandID) {
+    this.commandID = commandID;
+    this.commands = {};
+    this.commands[this.commandID] = {};
+    this.active = true;
+    this.port2 = channel.port2;
+    this.port2.addEventListener('message', this.handleMessage.bind(this));
+    this.port2.start();
+    this.name = commandID
+  }
+
+  setName(name) {
+    this.name = name;
+  }
+
+  async registerCommand({ name, action, type = 'renderer', source = 'renderer', title = '' }) {
+    if(!name || !action){
+      console.warn('registerCommand error: name or action is null');
+      return;
+    }
+
+    if (name in this.commands[this.commandID]) {
+      console.warn(`register Command "${name}" already exists. Register failure. Skipping...`);
+      return;
+    }
+
+    try {
+      const result = await ipcRenderer.invoke('registerCommand', { command: { name: name, action: '', type: 'renderer', source: source, title: title }, commandID: this.commandID });
+      if (result == 'success') {
+        this.commands[this.commandID][name] = action;
+        lionContext.mergeState({ commands: { [name]: { type: type, title: title, source: lionContext.name } } });
+        console.warn(`Register command:${name}, success commands:`, this.commands);
+      } else {
+        console.warn(`Register command:${name} failed because of ${result}`);
+      }
+    } catch (error) {
+      console.warn('Register command error', error);
+    }
+  }
+
+  async callCommand(name, args) {
+    if (!this.active) {
+      console.warn(`${this.commandID}: ${name} command is not active`);
+      return;
+    }
+
+    if (name in this.commands[this.commandID]) {
+      console.warn(`Call command: call local command name:${name}`);
+      const result = await this.commands[this.commandID][name](args);
+      return result;
+    } else {
+      console.warn('Call command: not exist command, called remote command, command name:', name);
+      try {
+        const result = await ipcRenderer.invoke('callCommand', { name, args });
+        return result;
+      } catch (error) {
+        console.warn('Call command error', error);
+        return null;
       }
     }
   }
-});
 
-port2.start();
-
-
-
-
-// console.log('webcontent id', lionAPI.getWebcontentID());
-
-
-
-// commands.push(...initialCommands);
-// commands['preloadcommandtest1'] = initialCommands['preloadcommandtest1'];
-// commands['preloadcommandtest2'] = initialCommands['preloadcommandtest2'];
-
-
-
-
-
-
-export const registerCommand = async ({ name, action, type = 'renderer', source = 'renderer', title='' }) => {
-
-
-  // const existingCommand = commands[name];
-  // if (existingCommand) {
-  //   console.warn(`register Command "${name}" already exists.register failure Skipping...`);
-  //   return;
-  // }
-
-  //如果在本地上下文文件中已经存在该命令，则不再注册
-
-  if (name in commands[commandID]) {
-    console.warn(`register Command "${name}" already exists.register failure Skipping...`);
-    return;
+  async handleMessage(event) {
+    const message = event.data;
+    if (message.type === 'callCommand') {
+      const { type, name, args, commandID: id } = message;
+      if (!this.active) {
+        const myError = new Error(`${this.commandID} : command ${name} is not active`);
+        this.port2.postMessage({ type: 'callCommandResult', error: myError });
+        return;
+      }
+      if (id == this.commandID) {
+        try {
+          const result = await this.commands[this.commandID][name](args);
+          this.port2.postMessage({ type: 'callCommandResult', result });
+        } catch (error) {
+          this.port2.postMessage({ type: 'callCommandResult', error });
+        }
+      }
+    }
   }
 
-  // console.log(`register `,commands);
-
-  //先向系统注册，如果系统没有重复，则注册本地命令
-
-  try{
-  const result = await ipcRenderer.invoke('registerCommand', { command: { name: name, action: '', type: 'renderer', source: source, title: title }, commandID: commandID });
-  if (result == 'success') {
-    commands[commandID][name] = action;
-    lionContext.mergeState({ commands: { [name]: { type: type,title: title }} });
-    console.warn(`register command:${name}, success commands:`, commands);
-  } else {
-    console.warn(`register command:${name} failed because of ${result}`);
+  setActive(value = true) {
+    this.active = value;
   }
 
-  }catch(error){
-    console.warn('register command error',error);
-        
-
+  getCommands() {
+    console.log('getcommands:', this.commands);
+    return this.commands;
   }
 
-
-
-
-
-
-
-
-
-
-  // //先向系统申请注册，如果系统没有重复，则注册本地命令
-
-  // if (type === 'renderer') {
-  //   // ipcRenderer.send('registerCommand', { name: name, action: '', type: 'renderer', source: source,title:title });
-  //   const result = await ipcRenderer.invoke('registerCommand', { command: { name: name, action: '', type: 'system', source: source, title: title }, commandID: commandID });
-  //   console.log('commandID', commandID);
-
-  //   if (result == 'success') {
-  //     commands[name] = { name: name, action: action, type: type, source: source };
-  //     //上面维护的是本地action，下面维护的是全局command，但是没有action  todo 后期可改
-  //     lionContext.mergeState({ commands: { [name]: { type: type,title: title }} });
-
-  //     console.warn(`register command:${name}, success commands:`, commands);
-  //   } else {
-  //     console.warn(`register command:${name} failed because of ${result}`);
-  //   }
-
-  // }
-  // //处理错误参数的冗余，有人想注册系统命令，但不准许，一般不会用到
-  // type === 'system' && console.log('register system command ,but you dont have right ', name);
-
-
-
+  closePort() {
+    this.port2.close();
+  }
 }
 
+export const commands = new Commands(commandID);
+console.log("🚀 ~ file: commands.js:176 ~ commands:", commands)
+export default commands;
 
 
 
 
-
-
-export const callCommand = async (name, args) => {
-
-
-
-  // const command = commands[name];
-  // if (command) {
-  //   //如果存在于本地，则直接调用本地的action,如果不调用本地，直接呼叫main的命令也行，但是会增加通信成本
-  //   //   console.warn('exist command,call from local');
-  //   const result = await command.action(args);
-  //   console.warn(`call command :call local command name:${name}`);
-  //   //   console.log('command name', name);
-  //   return result;
-  // } else {
-  //   //   //如果不存在于本地，则呼叫main的命令
-  //   console.warn('call command: not exist command,called from remote, command name:', name);
-
-  //   const result = await ipcRenderer.invoke('callCommand', { name, args })
-  //   return result;
-
-  // }
-  // console.log('call command',name);
-  // console.log('commands',commands[commandID]);
-  // console.log('-------')
-  if(name in commands[commandID]){
-    console.warn(`call command :call local command name:${name}`);
-    const result = await commands[commandID][name](args);
-    return result;
-  }else{
-    console.warn('call command: not exist command,called remote command, command name:', name);
-    const result = await ipcRenderer.invoke('callCommand', { name, args })
-    return result;
-  }
-
-
-
-
-}
-
-// const callCommandLocal = async (name, args) => {
-
-//   const command = commands[name];
-//   if (command) {
-//     //如果存在于本地，则直接调用本地的action
-//     console.warn(`call command from local : command name:${name}`);
-//     const result = await command.action(args);
-
-//     return result;
-//   }
-//   else {
-//     console.warn('not exist local command');
-//     return null;
-//   }
-
-// }
-
-
-
-
-
-export const getCommands = () => {
-  console.log('getcommands:', commands);
-  return commands;
-
-}
 
 
 lionEvent.register('extension.port.close', (data) => {
   console.log('extension.port.close  command', data);
   // console.log('portMap', portMap);
-  port2.close();
+  commands.closePort();
 }
 );
 
 
-
-// //监听main进程的callCommand消息，如果有，则调用本地的callCommand
-// ipcRenderer.on('callCommand', async (event, { name, args, commandID: id }) => {
-
-//   if (id == commandID) {
-
-//     try {
-//       const result = await callCommandLocal(name, args);
-//       ipcRenderer.send('callCommandResult', { result });
-//       console.log('main callCommand result id', id, 'result', result);
-
-//     }
-//     catch (error) {
-//       console.log('callCommand error', error);
-//       ipcRenderer.send('callCommandResult', { error });
-
-//     }
-//   }
-
-
-// });
 
 
 
