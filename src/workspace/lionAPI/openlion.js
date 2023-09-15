@@ -11,7 +11,6 @@ const {ipcRenderer} = require('electron');
 import command from '../command/commands';
 
 import { lionExtension } from '../extension/LionExtension';
-import { lionCommand } from 'openlion';
 
 // console.log(registerCommand, getCommands, callCommand);
 
@@ -68,19 +67,20 @@ export const openlion = {
 
 
     },
-    openWebview: ({url,tip,title,where,aburl}) => {
+    openWebview: ({url,tip,title,where,aburl,uid}) => {
+        const config = lionContext.getConfig();
         if(where=='mainpanel' && url && !aburl ){
             // lionContext.getConfig().root
-        lionCommand.call('mainpanel.openwebview', { url: path.join(lionContext.getConfig().root,url), tip: tip, title: title})
+        openlion.lionCommand.call('mainpanel.openwebview', { url: path.join(lionContext.getConfig().root,url), tip: tip,uid:uid, title: title,config:config})
         }
         if(where=='leftpanel' && url && !aburl ){
-            lionCommand.call('leftpanel.openwebview', { url: path.join(lionContext.getConfig().root,url), tip: tip, title: title})
+            openlion.lionCommand.call('leftpanel.openwebview', { url: path.join(lionContext.getConfig().root,url),uid:uid, tip: tip, title: title,config:config})
         }
         if(where=='mainpanel' && aburl){
-            lionCommand.call('mainpanel.openwebview', { url: aburl, tip: tip, title: title})
+            openlion.lionCommand.call('mainpanel.openwebview', { url: aburl, uid:uid,tip: tip, title: title,config:config})
         }
         if(where=='leftpanel' && aburl){
-            lionCommand.call('leftpanel.openwebview', { url: aburl, tip: tip, title: title})
+            openlion.lionCommand.call('leftpanel.openwebview', { url: aburl,uid:uid, tip: tip, title: title,config:config})
         }
 
     },

@@ -1,12 +1,13 @@
 
 // import lionEvent from './workspace/event/lionevent';
+import { ipcRenderer } from 'electron';
 import openlion from './workspace/lionAPI/openlion';
+
 
 
 window.openlion = openlion;
 
 // ipcRenderer.send('sendID','no')
-
 
 // const lionAPI = {
 //     setTitle: (title) => {

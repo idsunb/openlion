@@ -64,11 +64,20 @@ function mainpanelReducer(state, action) {
         activeTab: newReactTabPanel.id,
       };
     case 'OPEN_NEW_WEBVIEW_TABPANEL':
+      //如果uid已经存在，不再打开新的webview
+      const uid = action.payload.pros.id;
+      if(state.tabPanels.some((tabPanel) => tabPanel.pros.id == uid)){
+        console.log('uid已经存在，不再打开新的webview');
+        return state;
+      }
+
       const newWebviewTabPanel = {
         id: state.tabPanels.length,
         type: action.payload.type,
         pros: action.payload.pros,
+        config:action.payload.config
       };
+
       return {
         ...state,
         activeTab: newWebviewTabPanel.id,
@@ -108,6 +117,7 @@ function mainpanelReducer(state, action) {
 
 const MainPanel = () => {
   const savedState = localStorage.getItem('tabBarState');
+
 
 
 
@@ -164,35 +174,45 @@ const MainPanel = () => {
 
 
 
-  const handleOpenWebview = ({url, title,tip}) => {
-  console.log("🚀 ~ file: MainPanel.jsx:143 ~ handleOpenWebview ~ url:", url)
-
+  const handleOpenWebview = async ({url, title,uid,tip,config}) => {
+  console.log("🚀 ~ file: MainPanel.jsx:168 ~ handleOpenWebview ~ url, title,uid:", url, title,uid)
+    if(!url || !title || !uid){
+      console.log('url,title,uid 不能为空');
+      return;
+    }
     // const test = 'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html'
     const preloadpath = 'D:\\文档\\codes\\openlion\\esbuild\\extensionpreload.js';
 
+
+    
+    
+
     // file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chat3/chat.html
-    dispatch({
+    await dispatch({
       type: 'OPEN_NEW_WEBVIEW_TABPANEL',
       payload: {
         type: 'webview',
         pros: {
+          className:styles.webview,
           title: title,
-          id: "MainPanel-" + title,
+          id: uid,
           nodeintegration: "true",
 
           // src:"http://localhost:3000/chat_extension",
           src: url,
           // src: testpath,
-          style: { width: '400px', height: '300px' },
+          // style: { width: '100%', height: '100%' },
           preload: `file://${preloadpath}`,
 
           webpreferences: 'nodeIntegration=true, contextIsolation=false'
         },
+        config:config
       },
     });
+
+    
+
   };
-
-
 
 
   const handleclear = async () => {
@@ -206,38 +226,6 @@ const MainPanel = () => {
     //   webviews[i].getWebContents()
     }
     dispatch({ type: 'CLEAR_TAB_BAR_STATE' });
-  };
-
-  const handleOpenNewTabPanelTest = (data) => {
-    console.log('handleOpenNewTabPanelTest');
-    const { name, path: windowsPath } = data;
-    // 将 Windows 路径转换为 Unix 路径
-    const fileUrl = 'file:///' + windowsPath;
-
-    const unixPath = path.join('/', windowsPath.replace(/\\/g, '/')).normalize();
-    dispatch({
-      type: 'OPEN_NEW_WEBVIEW_TABPANEL',
-      payload: {
-        type: 'webview',
-        pros: {
-          title: name,
-          id: "chatextension",
-          nodeintegration: "true",
-          src: fileUrl,
-          style: { width: '400px', height: '300px' },
-          webpreferences: {
-            devTools: true,
-            nodeIntegration: true,
-            // nodeIntegrationInWorker: true,
-            // nodeIntegrationInSubFrames: true,
-            // webviewTag: true,
-            // enableRemoteModule: true,
-            // contextIsolation: false,
-
-          }
-        },
-      },
-    });
   };
 
 
@@ -274,9 +262,6 @@ const MainPanel = () => {
 
 
 
-
-    // registerEvent('open-main-panel-tab', handleOpenNewTabPanelTest);
-    openlion.lionEvent.register('open-main-panel-tab', handleOpenNewTabPanelTest);
     openlion.lionCommand.register({name:'mainpanel.openwebview',action:handleOpenWebview});
     openlion.lionCommand.register({name:'mainpanel.deletewebview',action:handleDeleteTabByTitle});
 
@@ -301,6 +286,17 @@ const MainPanel = () => {
     //     console.log('webview beforeunload1');
     //   });
     // }
+
+    state.tabPanels.forEach((tabPanel,index) => {
+      if(tabPanel.type === 'webview'){
+        const webview = document.getElementsByName(`MainPanel-${index}`)[0]
+
+        webview.addEventListener('did-finish-load', () => {
+          webview.executeJavaScript('console.log("Hello from Webview!")');
+          webview.executeJavaScript(`openlion.lionContext.setConfig(${JSON.stringify(tabPanel.config)})`);
+        });
+      }
+    })
     localStorage.setItem('tabBarState', JSON.stringify(state));
 
   }, [state]);
@@ -317,9 +313,16 @@ const MainPanel = () => {
     // dispatch({ type: 'OPEN_DEVTOOLS', ref: ChatExtensionRef.current });
   };
 
+
+
+
+
   const tabPanellistRender = useMemo(() => {
 
-    return state.tabPanels.map(({ id, type, pros },index) => {
+    
+
+    return state.tabPanels.map(({ id, type, pros,config },index) => {
+      console.log('tabPane被渲染了');
       if (type === 'normaltext') {
         return (<TabPanel key={index} >{pros.content}</TabPanel>);
       }

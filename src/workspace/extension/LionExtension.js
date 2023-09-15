@@ -3,6 +3,7 @@ import {commands} from '../command/commands';
 import { lionEvent } from '../event/lionEvent';
 
 
+
 class LionExtension {
     constructor(name) {
       this.name = name;

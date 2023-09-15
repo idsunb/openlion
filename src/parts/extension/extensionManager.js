@@ -1,19 +1,21 @@
 // import fs from 'fs';
 const fs = require('fs');
+// import * as fs from 'fs';
 // import path, { parse } from 'path';
-const path = require('path');
+// const path = require('path');
+// import path from 'path';
 // import openlion from '../lionAPI/openlion';
 import lionEvent from '../../workspace/event/lionEvent';
+
+
+
+
+
 
 import { extensions } from './Extensions'
 import { set } from 'lodash';
 import openlion from '../../workspace/lionAPI/openlion';
 import { title } from 'process';
-
-
-
-
-
 
 
 
@@ -24,6 +26,7 @@ function isFolderStructureValid(path) {
     if (!stats.isDirectory()) {
         return false;
     }
+
 
     const files = fs.readdirSync(path);
     // const requiredFolders = ['src', 'public'];
@@ -58,7 +61,11 @@ function isFolderStructureValid(path) {
 }
 
 
+
+
+
 const extensionRoot = "C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions"
+
 
 
 const parseConfig = ({ exRootPath, config, extensions }) => {
@@ -129,8 +136,14 @@ const parseConfig = ({ exRootPath, config, extensions }) => {
 
 
 
-const scanPath = () => {
+
+
+
+
+export const scanPath = () => {
+
     const list = fs.readdirSync(extensionRoot)
+
     list.forEach((item) => {
         const exRootPath = `${extensionRoot}\\${item}`
 

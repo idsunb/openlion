@@ -1,4 +1,4 @@
-import { lionCommand } from "openlion";
+// import { lionCommand } from "openlion"
 import openlion from "../../src/workspace/lionAPI/openlion";
 import { lionExtension } from "../../src/workspace/extension/LionExtension";
 const path = require('path');
@@ -14,14 +14,10 @@ console.log('i am the langchain extension')
 
 
 
-
-
-
-
 openlion.lionExtension.setActive(()=>{
-    console.log("hahahahhahahahahhaha111111")
-    openlion.openWebview({url:"index.html",title:openlion.lionContext.getConfig().name,where:'leftpanel'})
-    openlion.openWebview({url:"chat/chat.html",title:openlion.lionContext.getConfig().name,where:'mainpanel'})
+    openlion.openWebview({url:"index.html",title:openlion.lionContext.getConfig().name,uid:"langchain-index",where:'leftpanel'})
+    // openlion.openWebview({url:"chat/chat.html",title:openlion.lionContext.getConfig().name,uid:"langchain-chat",where:'mainpanel'})
+    // openlion.openWebview({aburl:"http://localhost:8082/chat.html",title:openlion.lionContext.getConfig().name,where:'mainpanel'})
 
 
 

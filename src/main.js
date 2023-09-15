@@ -26,6 +26,7 @@ try {
 
 
 
+
 function showNotification ({title, body}) {
     new Notification({ title: title, body: body }).show()
   }
@@ -103,10 +104,10 @@ const createWindows = async () => {
 
   //for esbuild 
   // console.log('___dirname----------------------------',__dirname);
-  // mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  mainWindow.loadFile(path.join('./index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  // mainWindow.loadFile(path.join('./index.html'));
 
-  
+
 
 
 

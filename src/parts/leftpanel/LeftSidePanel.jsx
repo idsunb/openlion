@@ -5,11 +5,34 @@ import React, { useContext, lazy, Suspense, useState, useReducer, useMemo, useEf
 import styles from './LeftSidePanel.module.css';
 import { MyTabs, Tab, TabList, TabPanel } from '../../tabs/MyTabs';
 
+
 import ExtensionPanel from '../extension/ExtensionPanel';
 import SettingManagerUI from '../../setting/SettingManagerUI';
 import openlion from '../../workspace/lionAPI/openlion';
 import { set } from 'lodash';
 import TestView from '../../services/testpanel/TestView';
+// import math from 'mathjs';
+
+// import { OpenAI } from "langchain/llms/openai";
+// const { OpenAI } = require("langchain/llms/openai");
+
+// const model = new OpenAI({
+//     openAIApiKey: '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',//你的OpenAI API Key
+//     temperature: 0.9
+// });
+
+
+
+
+
+
+// const res = await model.call(
+//   "写一首诗，限制20个字"
+// );
+// console.log(res);
+
+
+
 
 
 // const {triggerEvent} = window.lionAPI;
@@ -18,6 +41,9 @@ import TestView from '../../services/testpanel/TestView';
 // import 'react-tabs/style/react-tabs.css';
 // import './LeftSidePanel.css';
 // import {} from './MyContext';
+
+
+
 
 
 const leftpanelInitialStates = {
@@ -37,9 +63,20 @@ const leftpanelReducer = (state, action) => {
         tabs: [...state.tabs, { id: state.tabs.length, type: "component", pros: { title: action.payload.title, tip: action.payload.tip, componentName: action.payload.componentName, component: action.payload.component } }],
       }
     case 'OPEN_NEW_WEBVIEW_TAB':
+      //如果uid已经存在，就不再打开新的webview
+      for (let index = 0; index < state.tabs.length; index++) {
+        const tab = state.tabs[index];
+        if(tab.type == 'webview'){
+          if(tab.pros.id == action.payload.pros.id){
+            console.log('webview已经存在，不再打开新的webview');
+            return state;
+          }
+        }
+      }
+
       return {
         ...state,
-        tabs: [...state.tabs, { id: state.tabs.length, type: "webview", pros: action.payload.pros }],
+        tabs: [...state.tabs, { id: state.tabs.length, type: "webview", pros: action.payload.pros,config:action.payload.config }],
       }
 
     case 'SET_ACTIVE_TAB':
@@ -72,28 +109,36 @@ const LazyExtensionManager1 = lazy(() => import('../extension/ExtensionPanel'));
 
 
 const LeftSidePanel = () => {
+
+  
   const [leftpanelState, dispatch] = useReducer(leftpanelReducer, leftpanelInitialStates);
 
   const handleOpenNewComponentTab = ({componentName, title, tip,component}) => {
     dispatch({ type: 'OPEN_NEW_COMPONENT_TAB', payload: { componentName, title, tip,component } });
   }
 
-  const handleOpenNewWebviewTab = ({ url, title, tip }) => {
+  const handleOpenNewWebviewTab = ({ url, title, tip,uid,config }) => {
 
-    console.log('handleOpenNewWebviewTab herellllll',url);
+    if(!url || !title || !uid){
+      console.log('url,title,uid 不能为空');
+      return;
+    }
+
     const preloadpath = 'D:\\文档\\codes\\openlion\\esbuild\\extensionpreload.js';
 
     dispatch({ type: 'OPEN_NEW_WEBVIEW_TAB', payload: {
       pros:{
             title: title,
-            id: 'LeftSidePanel-'+title,
+            id: uid,
             tip: tip,
             nodeintegration: "true",
             src: url,
             style: { width: '100%', height: '100%' },
             preload: preloadpath,
             webpreferences: 'nodeIntegration=true, contextIsolation=false'
-      }
+      },
+      config:config,
+
     } });
   }
 
@@ -119,6 +164,29 @@ const LeftSidePanel = () => {
 
 
 
+  useEffect(() => {
+    console.log('leftpanelState',leftpanelState);
+    //给每个webview初始化设置config
+    leftpanelState.tabs.forEach((tab,index) => {
+      if(tab.type == 'webview'){
+        const webview = document.getElementsByName('LeftPanle'+index)[0]
+        
+        webview.addEventListener('did-finish-load', () => {
+          webview.executeJavaScript('console.log("Hello from Webview!")');
+          // webview.executeJavaScript(`openlion.lionContext.setConfig(${JSON.stringify(tabPanel.config)})`);
+          webview.executeJavaScript(`openlion.lionContext.setConfig(${JSON.stringify(tab.config)})`);
+        }
+        )
+
+
+
+      }
+    });
+
+
+
+  }, [leftpanelState]);
+
 
 
   const tabPanelListRender = useMemo(() => {
@@ -134,6 +202,8 @@ const LeftSidePanel = () => {
             return (
               <TabPanel key={index} className={styles.tabpanel} mykey={tab.id}>
                 <webview name={'LeftPanle'+index} {...tab.pros} ></webview>
+                <button onClick={() => { document.getElementsByName('LeftPanle'+index)[0].openDevTools(); }}>打开webview 开发者工具</button>
+            <button onClick={() => { document.getElementsByName('LeftPanle'+index)[0].closeDevTools(); }}>关闭webview 开发者工具</button>
               </TabPanel>
             );
           }
@@ -143,7 +213,8 @@ const LeftSidePanel = () => {
 
 
 
-  const handleActiveTab = (index) => {
+  const handleActiveTab = async (index) => {
+
     dispatch({ type: 'SET_ACTIVE_TAB', payload: { activeTab: index } });
   }
 

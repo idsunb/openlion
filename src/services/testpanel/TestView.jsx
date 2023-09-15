@@ -27,7 +27,7 @@ const TestView = () => {
         window.postMessage({ type: 'mainpanel-add-react-tab-panel' }, '*');
       }
       const handleOpenWebview = () => {
-        openlion.lionCommand.call('mainpanel.openwebview',{url:'http://localhost:5181',title:'test here'});
+        openlion.lionCommand.call('mainpanel.openwebview',{url:'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html',title:'test here',uid:'testview',config:openlion.lionContext.getConfig()});
       }
       const handleclear = () => {
         window.postMessage({ type: 'mainpanel-clear' }, '*');

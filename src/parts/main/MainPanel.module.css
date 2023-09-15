@@ -21,6 +21,8 @@
     color: var(--dark-color);
   }
   
+
+
   .mainpanel a {
     color: var(--primary-color);
     text-decoration: none;
@@ -38,6 +40,8 @@
     list-style: none;
   }
   
+
+
   .tabs {
     display: flex;
     flex-direction: column;
@@ -47,6 +51,14 @@
     display: flex;
     flex-direction: row;
   } 
+
+  .webview {
+    flex-grow: 1;
+    height: 95%;
+
+
+  }
+
   
   .tab {
     padding: 3px;

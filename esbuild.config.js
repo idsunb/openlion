@@ -2,9 +2,17 @@ const esbuildConfig = () => require('esbuild').build({
     entryPoints: ['./src/index.jsx'],
     bundle: true,
     platform: 'node',
-    target: ['es2022','node18'], // 'es2017', 'chrome58', 'firefox57', 'safari11', 'edge16', 'node12', 'electron12', 'esnext'
+    // target: ['es2022','node18'],
+    target: ['chrome98'],
+    format: 'esm',
+
+
+
+     // 'es2017', 'chrome58', 'firefox57', 'safari11', 'edge16', 'node12', 'electron12', 'esnext'
     outfile: './esbuild/index.js',
-    loader:{ '.js': 'jsx' },
+    loader: { '.js': 'jsx', '.css':'local-css' },
+    sourcemap: true,
+
     external:['electron'],
   })
 
@@ -19,7 +27,7 @@ const esbuildConfig = () => require('esbuild').build({
     external:['electron'], // 'es2017', 'chrome58', 'firefox57', 'safari11', 'edge16', 'node12', 'electron12', 'esnext'
 })
   esbuildConfig()
-  esbuildConfig1()
+  // esbuildConfig1()
 
 //  require('esbuild').context().then(async (ctx) => {
 //   ctx.watch()}  )

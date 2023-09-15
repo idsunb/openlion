@@ -1,4 +1,4 @@
-import { lionCommand, lionContext } from "openlion";
+// import { lionCommand, lionContext } from "openlion";
 import openlion from "../../src/workspace/lionAPI/openlion";
 import { lionExtension } from "../../src/workspace/extension/LionExtension";
 const path = require('path');
@@ -12,7 +12,6 @@ console.log("🚀 ~ file: extension.js:9 ~ openlion.lionExtension.active:", open
 
 
 //覆盖lionExtension.active的方法
-
 
 
 

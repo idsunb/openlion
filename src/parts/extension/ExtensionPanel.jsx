@@ -1,5 +1,5 @@
 import React, { useEffect,useState } from "react";
-import { installAllExtensions } from "./extensionManager";
+import { scanPath } from "./extensionManager";
 import openlion from "../../workspace/lionAPI/openlion";
 import { extensions } from "./Extensions";
 

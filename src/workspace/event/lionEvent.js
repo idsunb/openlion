@@ -2,18 +2,16 @@
 const { ipcRenderer } = require('electron');
 
 const EventEmitter = require('events');
+// import {EventEmitter} from 'events';
 
 const id = Math.random().toString(36).substring(2, 9);
 const eventID = `event-${id}`;
 
 
 
-
-
 const channel = new MessageChannel()
 const port1 = channel.port1
 const port2 = channel.port2
-
 
 ipcRenderer.postMessage('events', {eventID:eventID}, [port1])
 

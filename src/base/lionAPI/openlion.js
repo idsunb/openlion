@@ -6,7 +6,6 @@ import lionEvent from  '../event/lionEvent';
 
 
 
-
 const openlion = {
     // triggerEvent: triggerEvent,
     // registerEvent: registerEvent,

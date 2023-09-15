@@ -22,6 +22,9 @@ export default defineConfig({
       'electron': 'electron'
 
     },
+    build: {
+        loader: { '.js': 'jsx' }
+    },
 
     
     // plugins: [reactRefresh()],
