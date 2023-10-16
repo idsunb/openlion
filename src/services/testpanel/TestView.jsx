@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {openlion} from '../../workspace/lionAPI/openlion';
+const { execSync } = require('child_process');
 
 
 
@@ -24,10 +25,11 @@ const TestView = () => {
         window.postMessage({ type: 'mainpanel-add-tab-panel' }, '*');
       }
       const handleOpenNewRactTabPanel = () => {
-        window.postMessage({ type: 'mainpanel-add-react-tab-panel' }, '*');
+
+        openlion.lionCommand.call('mainpanel.openreact',{title:'react test',tooltip:'react test',uid:'test',componentname:"TabPanelTest2"});
       }
       const handleOpenWebview = () => {
-        openlion.lionCommand.call('mainpanel.openwebview',{url:'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html',title:'test here',uid:'testview',config:openlion.lionContext.getConfig()});
+        openlion.lionCommand.call('mainpanel.openwebview',{url:'file:///C:/Users/Administrator/AppData/Roaming/openlion/extensions/chatextension/index.html',title:'test here',tooltip:'webview test',uid:'testview',config:openlion.lionContext.getConfig()});
       }
       const handleclear = () => {
         window.postMessage({ type: 'mainpanel-clear' }, '*');
@@ -97,8 +99,25 @@ const TestView = () => {
         console.log(openlion.lionContext.getTestState());
         openlion.lionCommand.call('infopanel.addmessage',openlion.lionContext.getState());
       }
+      const handleCheckPython = () => {
 
+        try {
+          // 执行 python 命令，并获取输出
+          const output = execSync('python --version').toString();
+          console.log(`Python version: ${output.trim()}`);
+        } catch (error) {
+          // 如果执行 python 命令失败，则说明没有安装 Python
+          console.error('Python is not installed.');
+        }
+      }
 
+      const handleOpenKeybing = () => {
+        openlion.lionCommand.call('mainpanel.openreact',{ title: '快捷键管理',uid:'key binding manager', tooltip:"key bingding", componentname: 'KeybindingManager'});
+      } 
+
+      const handleOpenActionPanle = () => {
+        openlion.lionCommand.call('mainpanel.openreact',{ title: '动作管理器',uid:'action panel', tooltip:"action panel", componentname: 'ActionPanel'});
+      }
 
     return (<div>
       
@@ -137,7 +156,11 @@ const TestView = () => {
         <button onClick={handleGetState}>得到state</button>
         <br/>
         <h2>快捷键管理</h2>
-        <button onClick={()=>{openlion.lionCommand.call('mainpanel.keybinding.panel.open')}}>打开快捷键管理</button>
+        <button onClick={handleOpenKeybing}>打开快捷键管理</button>
+        <br/>
+        <button onClick={handleOpenActionPanle}>打开动作管理器</button>
+
+        <button onClick={handleCheckPython}>检查是否安装了python</button>
     </div>
 
 

@@ -1,6 +1,7 @@
 // import { ipcRenderer } from 'electron';
 const {ipcRenderer} = require('electron');
-const _ = require('lodash');
+// const _ = require('lodash');
+import {merge} from 'lodash';
 import lionEvent from '../event/lionEvent';
 
 const id = Math.random().toString(36).substring(2, 9);
@@ -63,7 +64,7 @@ class LionContext {
     async setConfig(config) 
     {
         // this.states[contextID].config = config;
-        // _.merge(this.states[contextID],config);
+        // merge(this.states[contextID],config);
         await this.mergeState({config:config})
     }
 
@@ -85,7 +86,7 @@ class LionContext {
     getState() {
         const valuesArray = Object.values(this.states);
         const mergedObject = valuesArray.reduce((result, value, index) => {
-            result = _.merge({},result,value);
+            result = merge({},result,value);
             return result;
         }, {});
         return mergedObject

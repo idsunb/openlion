@@ -1,4 +1,5 @@
-import {  ipcMain } from 'electron';
+// import {  ipcMain } from 'electron';
+const {ipcMain} = require('electron');
 import { lionContext } from '../context/lionContext';
 
 //这是系统命令，不是用户自定义命令
@@ -40,7 +41,6 @@ export const registerCommand = ({ name, action, type , source = 'system' ,title}
 
 
 
-  console.log(`registetr command commands:`,commands);
   return;
 
 
@@ -54,12 +54,13 @@ export const registerCommand = ({ name, action, type , source = 'system' ,title}
 
 function sendMessage(port,message) {
   return new Promise((resolve) => {
-    port.on('message', (event) => {
+    port.once('message', (event) => {
+      console.log('xxxxx;event',event);
       resolve(event.data);
     });
 
-    console.log('here',message);
-    console.log('port',port)
+    //生成随机的时间戳，用于验证返回值
+
     port.postMessage(message);
   });
 }
@@ -129,7 +130,6 @@ export const callCommand = async (name, args ) => {
 
 
 export const getCommands = () => {
-  console.log(`getcommands:`,commands);
   return commands;
 }
 
@@ -155,7 +155,6 @@ export const getCommands = () => {
 
 ipcMain.handle('registerCommand', (event, { command, commandID }) => {
 
-  console.log(commandID)
   //如果存在,返回错误
   if(command.name in commands[commandID]){
     return 'already exist command,register failure';
@@ -164,7 +163,6 @@ ipcMain.handle('registerCommand', (event, { command, commandID }) => {
     commands[commandID][command.name] = command.action;
     // lionContext.mergeState({ commands: { [command.name]: { type: command.type, title: command.title } } });
 
-    console.log('registercommand----------------', commands);
 
     return 'success';
 
@@ -203,7 +201,6 @@ ipcMain.handle('registerCommand', (event, { command, commandID }) => {
 //处理远端callCommand
 ipcMain.handle('callCommand', async (event, { name, args }) => {
 
-  console.log('system callCommand', name, args);
   const result = await callCommand(name, args);
   return result;
   // callCommand(command.name, command.args);
@@ -247,15 +244,8 @@ ipcMain.on('commands', (event,data) => {
   
 
 
-  port.on('message', async (event) => {
-
-    const message = event.data;
-
-  })
-
 
   port.on('close', () => {  
-    console.log('port closed commands');
     delete commands[commandID];
     portMap.delete(port);
     // console.log(`port closed `,data);

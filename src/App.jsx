@@ -15,8 +15,11 @@ import RightSidePanel from './parts/rightpanel/RightSidePanel';
 import styles from './App.module.css';
 import {MyContextProvider} from './MyContext';
 import LionCommand from './parts/lioncommand/LionCommand';
+import StatusBar from './parts/statusbar/StatusBar';
 // import openlion from './workspace/lionAPI/openlion';
 import {initKeybinds, getkeybinds} from './workspace/keybinding/keybinding';
+import ContextMenu from './workspace/contextmenu/ContextMenu';
+import { im } from 'mathjs';
 initKeybinds();
 openlion.getkeybinds=getkeybinds;
 
@@ -36,34 +39,35 @@ function App() {
 
 
 
-  function StatusBar() {
-    return (
-      <div className={styles.statusBar}>
-        <span>状态栏</span>
-      </div>
-    );
-  }
+
+
 
   const content = (
+    <>
     <div className={styles.app}>
+    <div className={styles.mainbox}>
         <LeftSidePanel  />
-        <MainPanel title={'finlion'}/>
+        <MainPanel />
         <RightSidePanel  />
-        <LionCommand  />
-
-
     </div>
+
+    <StatusBar />
+    </div>
+    <LionCommand />
+    </>
+    
   );
 
 
   function myContexApp(){    
-    console.log('myContexApp');
     // console.log(MyContext);
     // 将数据传递给上下文对象的 Provider 组件
     return (
       <MyContextProvider>
+        <ContextMenu >
       {content}
-      {/* <StatusBar /> */}
+
+        </ContextMenu>
       </MyContextProvider>
   
 
@@ -73,13 +77,7 @@ function App() {
 
   return myContexApp();
 }
-// const App = () => {  
-//   return (
-//     <div>
-//       haha
-//     </div>
-//   );
-// };
+
 
 
 export default App;

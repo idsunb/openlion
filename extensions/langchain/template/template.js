@@ -6,13 +6,13 @@ import styles from './template.module.css';
 // const { OpenAI } = require("langchain/llms/openai");
 
 import { LLMChain } from "langchain/chains";
-
+// import { asyncRun } from "./py-worker";
 
 const container = document.getElementById('root');
 const root = createRoot(container);
 
-// const model = new OpenAI({ openAIApiKey: "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", temperature: 0.9 });
 
+// const model = new OpenAI({ openAIApiKey: "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", temperature: 0.9 });
 
 
 
@@ -26,6 +26,40 @@ import { ConversationChain } from "langchain/chains";
 // const { OpenAI } = require("langchain/llms/openai");
 // import {crypto} from 'crypto';
 // const crypto = require('crypto');
+// console.log('crypto',crypto)
+
+
+
+import * as url from 'url';
+
+
+// const path = require('path');
+
+
+
+// import { loadPyodide } from 'pyodide';
+
+
+
+// import { loadPyodide } from 'https://cdn.staticfile.org/pyodide/0.24.0/pyodide.mjs';
+// const { PythonShell } = require('pyodide');
+
+
+
+
+
+
+
+
+
+// const pyodidePromise = loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.17.0/full/' });
+
+// async function main(){
+//     let pyodide = await loadPyodide();
+//     console.log(pyodide.runPython("1 + 2"));
+//   }
+//   main();
+
 
 
 
@@ -82,12 +116,17 @@ const App = () => {
         setInputValue(event.target.value);
     };
 
+    
+
+
 
     const message = []
     const chat = new OpenAI({
-        openAIApiKey: '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',//你的OpenAI API Key
+        openAIApiKey: 'sk-LAwhVW2PPHk0clu4065039E860374a5e8571E8570597A69d',//你的OpenAI API Key
         temperature: 0.9,
         streaming: true,
+        modelName:"gpt-3.5-turbo",
+        organization:"org-QcIbZYHaay",
         callbacks: [
           {
             handleLLMNewToken(token) {
@@ -99,7 +138,12 @@ const App = () => {
             },
           },
         ],
-      },{baseURL:"https://openpass.idsunb.com/v1"});
+      },{baseURL:"https://api.ai-yyds.com/v1"});
+    //   },{baseURL:"https://openpass.idsunb.com/v1",organization:"org-QcIbZYHaay"});
+
+    //   
+
+
 
     const handleSendMessage = async () => {
         // setMessages([...messages, { text: inputValue, isUser: true }]);
@@ -169,6 +213,7 @@ const App = () => {
         </div>
     );
 }
+
 
 
 

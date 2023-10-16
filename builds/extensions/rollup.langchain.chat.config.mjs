@@ -58,7 +58,6 @@ export default [{
         }),
         
 
-
         resolve(),
         commonjs(),
         nodePolyfills( /* options */),

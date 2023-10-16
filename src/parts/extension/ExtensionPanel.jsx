@@ -1,11 +1,10 @@
 import React, { useEffect,useState } from "react";
-import { scanPath } from "./extensionManager";
+
 import openlion from "../../workspace/lionAPI/openlion";
 import { extensions } from "./Extensions";
 
 import Styles from "./ExtensionPanel.module.css";
-import { set } from "lodash";
-console.log("🚀 ~ file: ExtensionPanel.jsx:5 ~ lionExtensions:", extensions)
+
 
 
 // const activelist ={"name":{name:"",active:true}}
@@ -21,6 +20,7 @@ const getInit = () => {
     return exlist;
 
 }
+
 
 
 

@@ -2,20 +2,11 @@
 const fs = require('fs');
 // import * as fs from 'fs';
 // import path, { parse } from 'path';
-// const path = require('path');
+const path = require('path');
 // import path from 'path';
 // import openlion from '../lionAPI/openlion';
-import lionEvent from '../../workspace/event/lionEvent';
 
 
-
-
-
-
-import { extensions } from './Extensions'
-import { set } from 'lodash';
-import openlion from '../../workspace/lionAPI/openlion';
-import { title } from 'process';
 
 
 
@@ -116,15 +107,22 @@ const parseConfig = ({ exRootPath, config, extensions }) => {
     // };
 
 
+
     // (Actions[config.mode] || Actions.default)("mode");
 
     if ('main' in config && 'title' in config && 'name' in config) {
-        const { name, main, title,description} = config
-        console.log("🚀 ~ file: extensionManager.js:121 ~ parseConfig ~ name, main, title, mode:", name, main, title)
+        const { name, main, title,description,where} = config
+        // console.log("🚀 ~ file: extensionManager.js:121 ~ parseConfig ~ name, main, title, mode:", name, main, title)
         const entryPath = `${exRootPath}\\${config.main}`
+
+        //看main中是否包含  .htm  .html  如果包含则是webview模式,设置type为webview
+        const isWebview = main.includes('.htm') || main.includes('.html')
+        const type = isWebview ? 'webview' : 'js'
+
         
-        console.log("🚀 ~ file: extensionManager.js:124 ~ parseConfig ~ extensionPath:", entryPath)
-        extensions.setExtension({ name,root:exRootPath, entry: entryPath,description, title })
+        // console.log("🚀 ~ file: extensionManager.js:124 ~ parseConfig ~ extensionPath:", entryPath)
+        // extensions.setExtension({ name,root:exRootPath, entry: entryPath,description, title })
+        extensions[name] = { name, root: exRootPath, entry: entryPath, description, title ,active:false,type,where}
 
 
 
@@ -140,7 +138,7 @@ const parseConfig = ({ exRootPath, config, extensions }) => {
 
 
 
-export const scanPath = () => {
+export const scanPath = (extensions) => {
 
     const list = fs.readdirSync(extensionRoot)
 
@@ -151,7 +149,7 @@ export const scanPath = () => {
             //如果符合规范，读取config
             const configPath = `${exRootPath}\\extension.json`
             const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-            console.log("🚀 ~ file: extensionManager.js:73 ~ list.forEach ~ config:", config)
+            // console.log("🚀 ~ file: extensionManager.js:73 ~ list.forEach ~ config:", config)
             //解析config
             parseConfig({ exRootPath, config, extensions })
 
@@ -165,9 +163,9 @@ export const scanPath = () => {
 }
 
 
-scanPath()
 
-extensions.getAllExtensions()
+
+// extensions.getAllExtensions()
 // console.log("🚀 ~ file: extensionManager.js:161 ~ lionExtensions.getAllExtensions():", lionExtensions.getAllExtensions())
 
 
@@ -199,38 +197,6 @@ extensions.getAllExtensions()
 
 
 
-// let test1 = await import(temppath)
-// console.log("🚀 ~ file: extensionManager.js:170 ~ temppath:", temppath)
-
-// console.log("🚀 ~ file: extensionManager.js:167 ~ test:", test)
-// test.extension.setName('chat3')
-
-// test.extension.enable()
-// openlion.lionCommand.call('test1', 'js mode')
-// openlion.lionCommand.call('test1', 'js mode1')
-// test.commandTest.setActive(false)
-// openlion.lionCommand.call('test1', 'js mode2')
-
-
-
-// setTimeout(() => {
-//     // test.lionExtension.die()
-
-//     // test = null;
-//     console.log("🚀 ~ file: extensionManager.js:106 ~ setTimeout ~ test:", test)
-//     // delete require.cache[require.resolve('C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension3\\App.js')];
-
-
-// }, 5000);
-
-
-// let test2
-// setTimeout(async () => {
-//     console.log('test2');
-//     test2 = await import('C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension3\\App.js')
-//     console.log("🚀 ~ file: extensionManager.js:112 ~ setTimeout ~ test2:", test2)
-
-// }, 10000);
 
 
 

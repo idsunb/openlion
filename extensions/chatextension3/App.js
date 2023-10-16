@@ -1,5 +1,4 @@
 // import { registerCommand } from '../../src/workspace/command/commands';
-import { set } from 'lodash';
 import {openlion} from '../../src/workspace/lionAPI/openlion';
 // import openlion from 'openlion'
 export {openlion} from '../../src/workspace/lionAPI/openlion';

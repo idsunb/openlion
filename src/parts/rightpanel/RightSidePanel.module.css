@@ -2,7 +2,9 @@
   
   /* RightSidePanel */
   .rightsidepanel {
-    flex-basis: 300px;
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: row;
     height: 100%;
     background-color: var(--light-color);
     border-left: 1px solid var(--secondary-color);
@@ -10,57 +12,45 @@
   
 
 
-  .rightsidepanel h2 {
-    margin: 16px;
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--dark-color);
-  }
-  
-  .rightsidepanel ul {
-    margin: 0;
-    padding: 0;
-  }
-  
-  .rightsidepanel li {
-    margin: 8px 0;
-  }
-  
-  .rightsidepanel a {
-    display: block;
-    padding: 8px 16px;
-    border-radius: 4px;
-    color: var(--dark-color);
-    text-decoration: none;
-  }
-  
+
+
 
 
   
   .mytabs {
+    flex : 1 1 auto;
     display: flex;
     flex-direction: row-reverse;
+    justify-content: flex-end;
   }
   
 
 
   .tablist {
-    width: 50px;
+    flex: 0 0 50px;
     display: flex;
     flex-direction: column;
   }
-  
-  .tab {
-    list-style: none;
-    flex: 0 0 auto;
-    margin-right: 10px;
-    padding: 10px;
-    cursor: pointer;
-    user-select: none;
-    border: 1px solid transparent;
-    border-left: none;
-    
+
+  .tabpanellist
+  {
+    flex: 1 1 auto;
+
   }
+
+.tab {
+
+  list-style: none;
+  flex: 0 1 auto;
+  padding: 10px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-right: none;
+  /* 允许断词换行 */
+  overflow: hidden;
+  /* word-wrap: break-word;   */
+}
 
   .tab:hover {
     border-color: #a97373;

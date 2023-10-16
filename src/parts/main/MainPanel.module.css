@@ -1,8 +1,11 @@
 
   /* MainPanel */
   .mainpanel {
-    flex: 1;
     padding: 8px;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 
     
   }
@@ -42,15 +45,46 @@
   
 
 
-  .tabs {
-    display: flex;
-    flex-direction: column;
-  }
+
 
   .tablist {
+    flex: 0 1 auto;
+
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
+    
   } 
+
+  .innertablist {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    list-style: none;
+    flex: 1 1 0;
+    min-width: 0px;
+    max-width: 100px;
+    padding: 8px;
+    cursor: pointer;
+    user-select: auto;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    border-bottom: none;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+
+
+
+
+  }
+  .tab:hover {
+    border-color: #a97373;
+  }
+  
 
   .webview {
     flex-grow: 1;
@@ -60,20 +94,22 @@
   }
 
   
-  .tab {
-    padding: 3px;
-    margin: 6px;
-    background-color: #eee;
-    border-radius: 4px;
-    cursor: pointer;
+  .title {
+    flex: 1 1 0;
+    max-width: 200px;
+    min-width: 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
   }
 
-  .defaulttabpanel
-  {
-    display: none;
+  .button {
+    flex: 0 0 0;
+
+    overflow: auto;
+
   }
 
-  .selectedTabPanel
-  {
-    display: block;
-  }
+
+

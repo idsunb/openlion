@@ -7,7 +7,9 @@ import esbuild from 'rollup-plugin-esbuild'
 import livereload from 'rollup-plugin-livereload'
 import serve from 'rollup-plugin-serve'
 import postcss from 'rollup-plugin-postcss'
-
+import json from '@rollup/plugin-json';
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
 
 
 
@@ -25,11 +27,10 @@ export default [{
       //   presets: ['@babel/preset-react'],
       // }),
       resolve(),
-  
       esbuild({
         // esbuild 配置项
         // include: /\.[jt]sx?$/, // default, inferred from `loaders` option
-        exclude: /node_modules/, // default
+        // exclude: /node_modules/, // default
         target: ['es2022', 'node18'],
         minify: true,
         platform: 'node',
@@ -52,15 +53,21 @@ export default [{
         modules:true
       }),
       commonjs(),
+      // json(),
+      // globals(),
+
+      // builtins(),
+
       nodePolyfills( /* options */),
   
   
-      //   replace({
-      //     preventAssignment: false,
-      //     'process.env.NODE_ENV': '"development"'
-      //  })
+        replace({
+          preventAssignment: false,
+          'process.env.NODE_ENV': '"development"'
+       })
     ],
     external: ['electron','/@babel\/runtime/'],
-    exclude: "**/node_modules/**"
+    // include: "**/node_modules/**",
+    // exclude: "**/node_modules/**"
   
   },]

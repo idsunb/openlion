@@ -1,0 +1,11 @@
+{
+    "activate": "",
+    "deactivate": "",
+    "main": "extension.js",
+    "title": "python组件",
+    "version": "1.0.0",
+    "description":"python安装",
+    "publisher": "My Publisher",
+    "name": "python组件",
+    "preload":""
+  }

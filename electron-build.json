@@ -1,0 +1,19 @@
+{
+    "appId": "com.example.myapp",
+    "productName": "My App",
+    "electronVersion": "28.0.0-nightly.20230929",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "esbuild/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }

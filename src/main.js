@@ -1,12 +1,15 @@
 
 
 import { app, BrowserWindow,webContents,Notification ,ipcMain,dialog,Menu,session } from 'electron';
+// const {app, BrowserWindow,webContents,Notification ,ipcMain,dialog,Menu,session } = require('electron');
 import path from 'path';
 // const os = require('os')
+
 import os from 'os';
 // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
 import openlion from './base/lionAPI/openlion';
+
 
 
 
@@ -18,7 +21,7 @@ if (require('electron-squirrel-startup')) {
 
 // electronReloader();
 try {
-  require('electron-reloader')(module,{});
+  require('electron-reloader')(module,{ignore: ['chroma.log']});
 } catch (error) {}
 
 
@@ -52,7 +55,7 @@ function handleGetObject({name}) {
   console.log('handleGetObject name',name);
 
   if(name=='event')
-    return JSON.stringify(openlion.lionEvent.eventGroup);
+    return JSON.stringify(openlion.lionEvent.getLionEvents());
   if(name=='command')
     return JSON.stringify(openlion.lionCommand.getCommands());
   if(name=='context')
@@ -186,6 +189,28 @@ const initialCommand = ()=>{
 
 
 
+// const createWinddow2 = async () => {
+
+//   const win = new BrowserWindow({
+//     width: 800,
+//     height: 600,
+//     webPreferences: {
+//       // preload: path.join(__dirname, 'preload.js'),
+//       nodeIntegration: true,
+//       webviewTag: true,
+//       webSecurity: false,
+//       contextIsolation: false,
+//       devTools: true, // 启用 devTools 选项
+//       preload: path.join(__dirname, '/extensionManager/managerpreload.js')
+//     }
+//   })
+
+//   win.loadFile(path.join(__dirname, '/extensionManager/extensionManager.html'))
+//   win.webContents.openDevTools()
+// }
+
+
+
 app.on('ready', () => {
     ipcMain.handle('dialog:openFile', handleFileOpen);
     ipcMain.on('set-title', handleSetTitle)
@@ -199,6 +224,9 @@ app.on('ready', () => {
     });
     
     createWindows();
+    // createWinddow2();
+
+
     ipcMain.on('sendID', (event, data) => {
         console.log('sendID', data,'id',event.sender.id);
 

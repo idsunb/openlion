@@ -4,6 +4,9 @@ import styles from './command.module.css';
 import openlion from '../../workspace/lionAPI/openlion';
 
 
+
+
+
 // const commandInitialState = {
 //     isOpen: false,
 //     inputValue: '',
@@ -191,7 +194,10 @@ function LionCommand(props) {
                 {key}
                 </div>
             ))}
+
           </div>
+
+
         </div>
       )}
     </>

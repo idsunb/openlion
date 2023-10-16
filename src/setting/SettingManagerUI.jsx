@@ -1,10 +1,11 @@
 import React from 'react';
+import openlion from '../workspace/lionAPI/openlion';
 
 const SettingManager = () => {
 
     return (
         <div>
-        <h1>Setting Manager</h1>
+        {JSON.stringify(openlion.lionContext.getConfig())}
         </div>
     );
 }

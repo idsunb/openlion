@@ -1,0 +1,11 @@
+{
+
+    "main": "index.html",
+    "where": "leftpanel",
+    "title": "pyscript插件",
+    "version": "1.0.0",
+    "description":"pyscript的各种功能功能",
+    "publisher": "ranlion",
+    "name": "pyscript"
+
+  }

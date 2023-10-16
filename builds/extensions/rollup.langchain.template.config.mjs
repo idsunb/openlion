@@ -9,6 +9,10 @@ import serve from 'rollup-plugin-serve'
 import postcss from 'rollup-plugin-postcss'
 import html from '@rollup/plugin-html'
 import cleaner from 'rollup-plugin-cleaner';
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
+import json from '@rollup/plugin-json';
+
 
 
 
@@ -22,6 +26,11 @@ export default [{
         sourcemap: true,
 
     },
+    resolve: {
+      alias: {
+        'pyodide': '111',
+      }
+    },
     plugins: [
         // babel({
         //   presets: ['@babel/preset-react'],
@@ -32,10 +41,12 @@ export default [{
           ]
         }),
 
+  // 使用 rollup-plugin-node-globals 处理全局变量
+
         esbuild({
             // esbuild 配置项
             // include: /\.[jt]sx?$/, // default, inferred from `loaders` option
-            exclude: /node_modules/, // default
+            // exclude: /node_modules/, // default
             target: ['es2022', 'node18'],
             minify: true,
             platform: 'node',
@@ -54,12 +65,16 @@ export default [{
             sourcemap: false,
 
         }),
-        
 
 
+        // resolve({browser: true}),
         resolve(),
         commonjs(),
-        nodePolyfills( /* options */),
+
+        nodePolyfills(),
+        json(),
+        builtins(),
+
 
         //   replace({
         //     preventAssignment: false,
@@ -75,6 +90,8 @@ export default [{
               <head>
                 <meta charset="UTF-8">
                 <title>2</title>
+                <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+                <script defer src="https://pyscript.net/latest/pyscript.js"></script>
                 <link rel="stylesheet" type="text/css" href="template.css">
               </head>
               <body>
@@ -85,8 +102,9 @@ export default [{
             </html>`}
     }),
     ],
-    external: ['electron', '/@babel\/runtime/'],
-    exclude: "**/node_modules/**"
+    external: ['electron', '/@babel\/runtime/',],
+    
+    // exclude: "**/node_modules/**"
 
 
 },]

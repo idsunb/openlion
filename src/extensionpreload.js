@@ -1,11 +1,34 @@
 
 // import lionEvent from './workspace/event/lionevent';
-import { ipcRenderer } from 'electron';
+const { contextBridge } = require('electron')
+
+
+
+
+
 import openlion from './workspace/lionAPI/openlion';
 
 
 
-window.openlion = openlion;
+
+
+
+// console.log('preload')
+
+
+// openlion.lionCommand.registerCommand('test1', () => {
+//   console.log('test')
+// })
+
+
+
+
+
+
+
+
+
+// window.openlion = openlion;
 
 // ipcRenderer.send('sendID','no')
 
@@ -52,7 +75,7 @@ window.openlion = openlion;
 //   };
 
 
-  // contextBridge.exposeInMainWorld('openlion', openlion);
+  contextBridge.exposeInMainWorld('openlion', openlion);
 
 
   // contextBridge.exposeInMainWorld('sayhello', {

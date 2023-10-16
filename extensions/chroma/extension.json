@@ -1,0 +1,12 @@
+{
+    "activate": "",
+    "deactivate": "",
+    "main": "extension.js",
+    "title": "chroma库安装",
+    "version": "1.0.0",
+    "description":"chroma库安装,前置需求python,可自行安装,或通过python插件通过脚本安装",
+    "publisher": "My Publisher",
+    "name": "chroma库安装",
+    "preload":""
+
+  }

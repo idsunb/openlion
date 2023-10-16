@@ -6,36 +6,46 @@
   
   .tablist {
     display: flex;
+    flex-direction: row;
+    
     /* flex-wrap: nowrap; */
-    overflow-x: auto;
-    overflow-y: hidden;
+
     margin: 0;
     padding: 0;
     list-style: none;
     border-bottom: 1px solid #ccc;
     flex-wrap: wrap;
 
+
   }
   
   .tab {
     list-style: none;
-    flex: 0 0 auto;
-    margin-right: 10px;
-    padding: 10px;
+    flex: 1 1 0;
+    padding: 8px;
     cursor: pointer;
     user-select: none;
     border: 1px solid transparent;
+    border-radius: 3px;
     border-bottom: none;
-    flex-basis: auto;
+    display: flex;
+    flex-direction: row;
+
 
 
   }
   
   .active {
     border-color: #ccc !important;
+    user-select: none;
   }
   
 
+  .tabpanellist{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
   
   .tabpanel {
     flex: 1 1 auto;

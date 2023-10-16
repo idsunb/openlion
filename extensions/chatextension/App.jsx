@@ -2,6 +2,34 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import openlion from '../../src/workspace/openlion/openlion';
 // const {registerCommand, callCommand, getCommands } = openlion;
+import { Chroma } from "langchain/vectorstores/chroma";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+const { ChromaClient } = require("chromadb");
+
+
+const vectorStore = await Chroma.fromTexts(
+    [
+      `Tortoise: Labyrinth? Labyrinth? Could it Are we in the notorious Little
+          Harmonic Labyrinth of the dreaded Majotaur?`,
+      "Achilles: Yiikes! What is that?",
+      `Tortoise: They say-although I person never believed it myself-that an I
+          Majotaur has created a tiny labyrinth sits in a pit in the middle of
+          it, waiting innocent victims to get lost in its fears complexity.
+          Then, when they wander and dazed into the center, he laughs and
+          laughs at them-so hard, that he laughs them to death!`,
+      "Achilles: Oh, no!",
+      "Tortoise: But it's only a myth. Courage, Achilles.",
+    ],
+    [{ id: 2 }, { id: 1 }, { id: 3 }],
+    new OpenAIEmbeddings({verbose:true,openAIApiKey:'sk-LAwhVW2PPHk0clu4065039E860374a5e8571E8570597A69d'},{baseURL:"https://api.ai-yyds.com/v1"}),
+    {
+      collectionName: "godel-escher-bach",
+    }
+  );
+  
+  const response = await vectorStore.similaritySearch("scared", 2);
+  
+  console.log(response);
 
 
 const setTitle = () => {
@@ -9,6 +37,8 @@ const setTitle = () => {
 }
 
 const setCommand = () => {
+
+
 
 
 

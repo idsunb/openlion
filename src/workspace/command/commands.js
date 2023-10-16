@@ -54,7 +54,7 @@ ipcRenderer.postMessage('commands', { commandID: commandID }, [port1])
 //       port2.postMessage({ type: 'callCommandResult', error:new Error('This command is not active')});
 //       // console.log("🚀 ~ file: commands.js:55 ~ port2.addEventListener ~ message:", message)
 //       return;
-      
+
 //     }
 //     //冗余判断，一般来说发过来都是正确的
 //     if (id == commandID) {
@@ -97,9 +97,10 @@ class Commands {
     this.name = name;
   }
 
+
   async registerCommand({ name, action, type = 'renderer', source = 'renderer', title = '' }) {
-    if(!name || !action){
-      console.warn('registerCommand error: name or action is null');
+    if (!name || !action) {
+      throw new Error('registerCommand error: name or action is null ,the form is {name:"somename",action:fun}');
       return;
     }
 
@@ -109,12 +110,17 @@ class Commands {
     }
 
     try {
+      //首先在本地注册
+      this.commands[this.commandID][name] = action;
+
+      //然后在远端注册
       const result = await ipcRenderer.invoke('registerCommand', { command: { name: name, action: '', type: 'renderer', source: source, title: title }, commandID: this.commandID });
       if (result == 'success') {
-        this.commands[this.commandID][name] = action;
         lionContext.mergeState({ commands: { [name]: { type: type, title: title, source: lionContext.name } } });
         console.warn(`Register command:${name}, success commands:`, this.commands);
       } else {
+        //如果远端注册失败，则删除本地注册
+        delete this.commands[this.commandID][name];
         console.warn(`Register command:${name} failed because of ${result}`);
       }
     } catch (error) {
@@ -123,26 +129,58 @@ class Commands {
   }
 
   async callCommand(name, args) {
+    //如果传进来的第一个函数是一个对象
+    if (typeof name === 'object') {
+      const { name: commandName, args: commandArgs, arg } = name;
+      name = commandName;
+      args = commandArgs;
+      //如果没有name，则报错
+      if (!name) {
+        //抛出一个错误
+        throw new Error('you deliver a wrong from, call command with object {name:"somename",args:{}}');
+      }
+      //如果错传进来的是arg，没有args，则提醒
+      if (arg) {
+        //抛出一个错误
+        throw new Error('you deliver a wrong from, call command with object {name:"somename",args:{}}');
+      }
+    }
+
+
     if (!this.active) {
       console.warn(`${this.commandID}: ${name} command is not active`);
       return;
     }
-
+    //如果是本地的命令
     if (name in this.commands[this.commandID]) {
-      console.warn(`Call command: call local command name:${name}`);
+
+      if (args) {
+        console.warn(`Call command: call local command name:${name} with args:`, args);
+      } else {
+        console.warn(`Call command: call local command name:${name}`);
+      }
+
       const result = await this.commands[this.commandID][name](args);
       return result;
-    } else {
-      console.warn('Call command: not exist command, called remote command, command name:', name);
+    } else
+    //本地没有的话，调用远端的命令
+    {
+      if (args) {
+        console.warn(`Call command: not exist command, called remote command, command name:${name} with args:`, args);
+      } else {
+        console.warn(`Call command: not exist command, called remote command, command name:${name}`);
+      }
       try {
         const result = await ipcRenderer.invoke('callCommand', { name, args });
+        console.log('callCommand result', result);
         return result;
       } catch (error) {
         console.warn('Call command error', error);
-        return null;
+        return error;
       }
     }
   }
+
 
   async handleMessage(event) {
     const message = event.data;
@@ -155,14 +193,16 @@ class Commands {
       }
       if (id == this.commandID) {
         try {
-          const result = await this.commands[this.commandID][name](args);
-          this.port2.postMessage({ type: 'callCommandResult', result });
+          // const result = await this.commands[this.commandID][name](args);
+          const result = await this.callCommand(name, args);
+          this.port2.postMessage({ type: 'callCommandResult', result});
         } catch (error) {
           this.port2.postMessage({ type: 'callCommandResult', error });
         }
       }
     }
   }
+
 
   setActive(value = true) {
     this.active = value;
@@ -179,7 +219,6 @@ class Commands {
 }
 
 export const commands = new Commands(commandID);
-console.log("🚀 ~ file: commands.js:176 ~ commands:", commands)
 export default commands;
 
 

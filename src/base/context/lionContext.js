@@ -1,4 +1,5 @@
-import { ipcMain, BrowserWindow } from "electron";
+// import { ipcMain, BrowserWindow } from "electron";
+const {ipcMain, BrowserWindow} = require('electron');
 const _ = require('lodash');
 
 
@@ -122,7 +123,7 @@ ipcMain.on('lionport', (event,data) => {
     if (message.type === 'getState') {
     //   const newState = message.payload;
       // 执行更新状态的操作
-      console.log('here i receive getState and send states',lionContext.states);
+    //   console.log('here i receive getState and send states',lionContext.states);
       port.postMessage(lionContext.states);
     }
     if (message.type === 'setState') {
@@ -147,7 +148,7 @@ ipcMain.on('lionport', (event,data) => {
   port.on('close', () => {  
     portMap.delete(port);
     lionContext.deleteStateByID(contextID);
-    console.log(`port closed context `);
+    // console.log(`port closed context `);
   })
   // MessagePortMain 阻塞消息直到 .start() 方法被调用
   port.start()

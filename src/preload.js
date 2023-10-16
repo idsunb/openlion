@@ -1,5 +1,57 @@
 
-import path from 'path';
+// const path = require('path');
+// const fs = require('fs');
+// const EventEmitter = require('events');
+
+// const { contextBridge,ipcRenderer } = require('electron')
+
+
+// contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer)
+
+// contextBridge.exposeInMainWorld('path', path);
+// contextBridge.exposeInMainWorld('fs', fs);
+// contextBridge.exposeInMainWorld('EventEmitter', EventEmitter);
+
+// import { OpenAI } from "langchain/llms/openai";
+
+// const model = new OpenAI({
+//   openAIApiKey: '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',//你的OpenAI API Key
+//   temperature: 0.9
+// });
+
+
+
+// const call = async () => {
+//   const res = await model.call(
+//     "1111111111111111"
+//     );
+//     console.log('res')
+
+//     console.log(res)
+// }
+
+
+// call()
+
+
+
+// const _ = require('lodash');
+
+
+// const importM = async (path) => {
+//   const module = await import(path);
+//   // const module  = await import("C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension2\\extension.js")
+//   console.log('module',module)
+
+//   return module;
+// };
+
+
+
+
+
+// importM("C:\\Users\\Administrator\\AppData\\Roaming\\openlion\\extensions\\chatextension2\\extension.js");
+
 
 // import MyContext from './MyContext';
 // import {useMyContextState} from './MyContext';
@@ -15,7 +67,6 @@ import path from 'path';
 
 // window.lionAPIP = openlion;
 
-
 // openlion.lionCommand.register({name:'test',action:() => {console.log('test from preload')}});
 
 // //初始化快捷键
@@ -29,8 +80,9 @@ import path from 'path';
 // });
 
 
-// ipcRenderer.send('sendID','preload')
 
+
+// ipcRenderer.send('sendID','preload')
 
 // path.join(__dirname, 'preload.js')
 
@@ -41,6 +93,7 @@ import path from 'path';
 
 let chat_url = '';
 let chat_name = '';
+
 
 
 

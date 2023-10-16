@@ -7,7 +7,7 @@
   "publisher": "My Publisher",
   "description":"用来测试模块插件和webview类型混合的插件",
   "name": "my-extension-test2",
-  "mode": "mix",
+  "mode": "js",
   "preload":"",
   "codes": {
       "activeEvents": [

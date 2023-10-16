@@ -2,7 +2,9 @@ const { ipcMain } = require('electron');
 // import { ipcMain } from 'electron';
 
 
+
 const EventEmitter = require('events');
+
 
 
 
@@ -20,19 +22,19 @@ class LionEvent {
   register(name, handler) {
     console.log('registering system event', name);
     this.lionEvents.on(name, handler);
-    console.log(this.lionEvents);
-    console.log('event group', {...eventGroup});
+    // console.log(this.lionEvents);
+    // console.log('event group', {...eventGroup});
   }
 
   trigger(name, args) {
-    console.log('triggering event', name, args,this.lionEvents);
+    // console.log('triggering event', name, args,this.lionEvents);
     this.lionEvents.emit(name, args);
   }
 
   remove(name, handler) {
-    console.log('removing event', name);
+    // console.log('removing event', name);
     this.lionEvents.removeListener(name, handler);
-    console.log(this.lionEvents);
+    // console.log(this.lionEvents);
   }
 }
 
@@ -71,7 +73,7 @@ class LionEvent {
 //收到渲染进程发来的系统触发事件，触发lionEvent的事件，会调用在main中注册的回调函数
 //如果是非系统事件，就会回调到webcontent的send事件，来调用渲染进程的trigger
 ipcMain.on('triggerEvent', (event, {name,eventID, args}) => {
-  console.log('triggerEvent', name,eventID, args,lionEvent.getLionEvents());
+  // console.log('triggerEvent', name,eventID, args,lionEvent.getLionEvents());
   lionEvent.trigger(name, args);
 });
 
@@ -97,7 +99,6 @@ ipcMain.on('events', (event,data) => {
   const port = event.ports[0]
   const eventID = data.eventID;
 
-  console.log('iam the event');
 
 
 
@@ -112,7 +113,7 @@ ipcMain.on('events', (event,data) => {
       };
       addObjectToKey(eventID,name, handler);
       lionEvent.register(name, handler);
-      console.log('eventGroup', eventGroup);
+      // console.log('eventGroup', eventGroup);
     }
 
 
@@ -123,7 +124,7 @@ ipcMain.on('events', (event,data) => {
     // delete commands[commandID];
     // portMap.delete(port);
     console.log(`port closed lionevent`);
-    console.log('eventGroup', eventGroup);
+    // console.log('eventGroup', eventGroup);
     for (const name in eventGroup[eventID]) {
       lionEvent.remove(name, eventGroup[eventID][name]);
     }

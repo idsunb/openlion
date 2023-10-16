@@ -2,6 +2,9 @@ import lionEvent from '../event/lionEvent';
 
 import { lionContext } from '../context/lionContext';
 const path = require('path');
+import { utils } from './utils';
+import StatusItem from '../item/StatusItem';
+// import {SHA256} from 'crypto-js';
 
 
 
@@ -21,8 +24,7 @@ import { lionExtension } from '../extension/LionExtension';
 //     console.log('system.eventtest1', data);
 // });
 // lionEvent.trigger('system.eventtest1', 1234);
-
-
+let openlionContext = [];
 
 export const openlion = {
     // triggerEvent: triggerEvent,
@@ -84,6 +86,33 @@ export const openlion = {
         }
 
     },
+    chekDependency:utils.chekDependency,
+    createStatusBarItem:(alignment,priority,id)=>{
+        //产生uid
+        const name = lionContext.getConfig().name;
+        const sid = Math.random().toString(36).substring(2, 9);
+        const statusID = `${name}-${sid}`;
+
+
+        const item =  new StatusItem(alignment,priority,statusID)
+        openlionContext.push(item)
+        return item
+    },
+    contextDispose:()=>{
+        console.log('contextDispose');
+        console.log('openlionContext',openlionContext);
+        openlionContext.forEach(item=>{
+            console.log(item);
+            item.dispose()
+        })
+    },
+    StatusBar:{
+        Left:'left',
+        Right:'right',
+
+    },    
+
+        
 
 
 

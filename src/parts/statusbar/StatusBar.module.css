@@ -1,0 +1,28 @@
+
+
+.statusBar {
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-basis: 20px;
+    background-color: #eee;
+  }
+
+
+  .leftBar{
+    display: flex;
+    flex-direction: row;
+  }
+
+
+    .rightBar{
+        display: flex;
+        flex-direction: row;
+    }
+
+  .statusBarItem{
+    flex:auto;
+    padding: 0 5px;
+
+  }

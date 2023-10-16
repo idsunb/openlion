@@ -1,0 +1,17 @@
+{
+  "name": "chroma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "extension.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chromadb": "^1.5.11"
+  },
+  "devDependencies": {
+    "@rollup/plugin-dynamic-import-vars": "^2.0.6"
+  }
+}

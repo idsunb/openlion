@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <title>2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.24.0/pyodide.js" integrity="sha512-8r6+Sndk/6kGG9KsOpq1/5EwBa2PeFRvcPBrd58tLqn6F1S3DKQSH05gyf+KcV8Fe/GMrEfcH86QKat5JdGl6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+console.log("loading pyodide")
+async function main(){
+let pyodide = await loadPyodide();
+console.log(pyodide.runPython("1 + 2"));
+}
+console.log("loaded111 pyodide")
+
+console.log('path',path)
+
+
+    </script>
+
   </head>
   <body>
     <div id="root"></div>
